@@ -1,0 +1,175 @@
+﻿@using Newtonsoft.Json
+@using ZimraEGS.Helpers
+@model CloseDayViewModel
+
+@{
+    ViewData["Title"] = "Zimra Integration Setup";
+}
+
+<div class="container-fluid setup-container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Manager IO - Zimra Integration</h2>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8 mb-4">
+            <div class="card card-custom">
+                <div class="card-header section-header">
+                    <h5 class="mb-0">Receipt Reporting</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Current Receipt has been Reported and Approved by Zimra, Scan QRCode or Click Link to view Reporting Information or Click Close FiscalDay button to Close Device FiscalDay
+                    </p>
+                    <div class="mb-4 text-start">
+                        <!-- QR Code Section -->
+                        <div id="qrCodeImage"
+                             style="background-color: white; width: 140px; height: 140px; margin: 0 auto; border: 1px solid var(--bs-border-color-translucent); display: flex; align-items: center; justify-content: center;">
+                            <!-- QR code image will render here -->
+                        </div>
+
+                        <div class="text-break"
+                             style="margin-top: 15px; word-wrap: break-word; overflow-wrap: break-word; font-family: monospace; border: 1px solid var(--bs-border-color-translucent); padding: 8px; border-radius: 5px;background-color: var(--bs-card-cap-bg);">
+                            @if (!string.IsNullOrEmpty(Model.ReceiptQrCode))
+                            {
+                                <a href="@Model.ReceiptQrCode" target="_blank" style="color: inherit; text-decoration: none;">
+                                    @Html.Raw(Model.ReceiptQrCode)
+                                </a>
+                            }
+                        </div>
+
+                        <!-- Server Signature Section -->
+                        @if (Model.ReceiptReference != null)
+                        {
+                            <hr />
+                            <div class="mb-4 text-start">
+                                <label class="form-label">Approval Status Response</label>
+                                <textarea class="form-control" id="textareaResponse" rows="10" readonly>
+                                    @{
+                                        try
+                                        {
+                                            var formattedJson = DocumentFormatter.SerializeObject(Model.ReceiptReference);
+                                            @Html.Raw(formattedJson)
+                                            ;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            <text>Error processing the Manager invoice: @ex.Message</text>;
+                                        }
+                                    }
+                                </textarea>
+                            </div>
+                        }
+                    </div>
+                    <div class="mb-3 d-flex justify-content-between">
+                        <button type="button"
+                                id="backToManager"
+                                class="btn btn-secondary btn-sm"
+                                style="width: 200px;"
+                                name="backToManager"
+                                onclick="window.location.href='@Model.Referrer'">
+                            Back to Manager
+                        </button>
+                        <button type="button"
+                                id="closeDayButton"
+                                class="btn btn-primary btn-sm"
+                                style="width: 200px;">
+                                Close FiscalDay
+                            <i class="fa fa-spinner hidden" style="margin-left: 8px;"></i>
+                        </button>
+                    </div>
+                     
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="loading-indicator" id="loadingIndicator" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function showLoading() {
+                $('#loadingIndicator').fadeIn();
+            }
+
+            function hideLoading() {
+                $('#loadingIndicator').fadeOut();
+            }
+
+            $('#closeDayButton').click(async function (e) {
+                e.preventDefault();
+
+                const $btn = $(this);
+                const spinner = $btn.find('.fa-spinner');
+                spinner.removeClass('hidden');
+
+                const formData = $('form').serialize();
+
+                try {
+                    const response = await $.ajax({
+                        url: '@Url.Action("AjaxCloseDay")',
+                        method: 'POST',
+                        data: formData
+                    });
+
+                    // Parse response
+                    if (typeof response === 'string') {
+                        response = JSON.parse(response);
+                    }
+
+                    let message = '';
+
+                    if (response.ApiReference) {
+                        const apiRef = response.ApiReference;
+
+                        try {
+                            const apiRefResponse = await fetch(apiRef.ApiUrl, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${apiRef.SecretKey}`
+                                },
+                                body: apiRef.Payload
+                            });
+
+                            if (apiRefResponse.ok) {
+                                console.log('Update Zimra Reference successful!');
+                                message += 'Update Zimra Reference: successful\n';
+                            } else {
+                                message += 'Update Zimra Reference Error: Network response was not ok.\n';
+                            }
+                        } catch (error) {
+                            console.error(`Update Zimra Reference Error: ${error.message}`);
+                            message += `Update Zimra Reference Error: ${error.message}\n`;
+                        }
+                    }
+
+                    const formattedJson = JSON.stringify(response.closeDayResponse, null, 4);
+                    $('#textareaResponse').val(formattedJson);
+
+                    console.log('Close FiscalDay completed successfully!');
+
+                    // Disable the button after successful operation
+                    if (response.closeDayResponse && response.closeDayResponse.success) { // Adjust "success" to the actual success flag from your API response
+                        console.log('Close FiscalDay completed successfully!');
+                        $btn.prop('disabled', true); // Disable the button
+                        $btn.text('FiscalDay Closed'); // Optionally update the button text
+                    }
+
+                } catch (error) {
+                    $('#textareaResponse').val('Error: ' + error.message);
+                    console.error('Error processing request:', error);
+                } finally {
+                    spinner.addClass('hidden');
+                }
+            });
+        });
+    </script>
+}

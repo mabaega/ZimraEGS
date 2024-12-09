@@ -1,0 +1,725 @@
+﻿@model ZimraEGS.Models.SetupViewModel
+
+@{
+    ViewData["Title"] = "Setup Wizard";
+}
+
+<div class="container-fluid setup-container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Zimra Integration Setup</h2>
+        </div>
+    </div>
+
+   <form id="certInfoForm" action="/Setup/SaveCertificate" method="post">
+
+        <input type="hidden" name="Referrer" value="@Model.Referrer" />
+        <input type="hidden" name="BusinessDetails" value="@Model.BusinessDetails" />
+        <input type="hidden" name="Api" value="@Model.Api" />
+        <input type="hidden" name="Token" value="@Model.Token" />
+
+        <input type="hidden" id="isFileReady" value="@Model.IsFileReady.ToString().ToLower()" />
+        <input type="hidden" id="fileData" value="@Model.FileContent" />
+        <input type="hidden" name="Filename" value="@Model.Filename" />
+
+        <!-- Business Data Setup Section -->
+        <div class="col-md-12 mb-4">
+            <div class="card card-custom">
+                <div class="card-header section-header">
+                    <h5 class="mb-0">Business Data Setup</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">This section helps you create or update custom fields and footers required for Zimra Integration.</p>
+                    <div class="d-flex justify-content-center">
+                        <button type="button" id="backToManager" class="btn btn-secondary btn-sm" style="width: 200px; margin-right: 10px;" name="backToManager" onclick="window.location.href='@Model.Referrer'">Back to Manager</button>
+                        <button type="button" id="generateCustomField" class="btn btn-primary btn-sm" style="width: 200px;">Update Business Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Device Information Section -->
+        <div class="col-md-12 mb-4">
+            <div class="card card-custom">
+                <div class="card-header section-header">
+                    <h5 class="mb-0">Device Registration</h5>
+                </div>
+                <div class="card-body">
+                    
+                    <div class="row">
+                        <!-- First Column: 2 Rows, 3 Columns -->
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-group">
+                                        <label class="form-label" asp-for="@Model.CertificateInfo.DeviceID">Device ID</label>
+                                        <input asp-for="@Model.CertificateInfo.DeviceID" class="form-control form-control-sm readonly-control"  />
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-group">
+                                        <label class="form-label" asp-for="@Model.CertificateInfo.DeviceModelName">Model Name</label>
+                                        <input asp-for="@Model.CertificateInfo.DeviceModelName" class="form-control form-control-sm readonly-control"  />
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-group">
+                                        <label class="form-label" asp-for="@Model.CertificateInfo.DeviceModelVersion">Model Version</label>
+                                        <input asp-for="@Model.CertificateInfo.DeviceModelVersion" class="form-control form-control-sm readonly-control"  />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-group">
+                                        <label class="form-label" asp-for="@Model.CertificateInfo.DeviceSerialNumber">Serial Number</label>
+                                        <input asp-for="@Model.CertificateInfo.DeviceSerialNumber" class="form-control form-control-sm readonly-control"  />
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-group">
+                                        <label class="form-label" asp-for="@Model.CertificateInfo.ActivationKey">Activation Key</label>
+                                        <input asp-for="@Model.CertificateInfo.ActivationKey" class="form-control form-control-sm readonly-control"  />
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-group">
+                                        <label class="form-label" asp-for="@Model.CertificateInfo.IntegrationType">Integration Type</label>
+                                        <select asp-for="@Model.CertificateInfo.IntegrationType" class="form-control form-control-sm">
+                                            @foreach (var value in Enum.GetValues(typeof(Zimra.ApiClient.Models.EnvironmentType)))
+                                            {
+                                                <option value="@value">@value</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Second Column: 2 Rows, 1 Column -->
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-group">
+                                        <label class="form-label" asp-for="@Model.CertificateInfo.CommonName">Common Name</label>
+                                        <input asp-for="@Model.CertificateInfo.CommonName" class="form-control form-control-sm" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Row for buttons horizontally with equal width -->
+                            <div class="row">
+                                <div class="col-md-12"><hr></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <button type="button" id="verifyTaxPayerButton" class="btn btn-outline-primary btn-sm w-100">
+                                        Verify TaxPayer
+                                    </button>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <button type="button" id="registerDeviceButton" class="btn btn-outline-primary btn-sm w-100">
+                                        Register Device
+                                    </button>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <button type="button" id="getConfigButton" class="btn btn-outline-primary btn-sm w-100">
+                                        Get Device Config
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <hr />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- Tab Navigation and Content -->
+                        <div class="col-md-12">
+                            <ul class="nav nav-tabs" id="nav-tab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" id="nav-taxpayer-tab" data-bs-toggle="tab" href="#nav-taxpayer" role="tab" aria-controls="nav-taxpayer" aria-selected="true">Taxpayer Information</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="nav-register-tab" data-bs-toggle="tab" href="#nav-register" role="tab" aria-controls="nav-register" aria-selected="false">Register Device</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="nav-configuration-tab" data-bs-toggle="tab" href="#nav-configuration" role="tab" aria-controls="nav-configuration" aria-selected="false">Device Configuration</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="nav-tabContent">
+                                <!-- Taxpayer Tab -->
+                                <div class="tab-pane fade show active" id="nav-taxpayer" role="tabpanel" aria-labelledby="nav-taxpayer-tab">
+                                    <div class="tab-container" style="border: var(--bs-card-border-width) solid var(--bs-card-border-color); border-radius: 4px; padding: 20px; margin-top: 10px;  margin-bottom: 10px;">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.TaxPayerName">TaxPayer Name</label>
+                                                <input asp-for="@Model.CertificateInfo.TaxPayerName" class="form-control form-control-sm" readonly />
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.TaxPayerTIN">TIN</label>
+                                                <input asp-for="@Model.CertificateInfo.TaxPayerTIN" class="form-control form-control-sm" readonly />
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.VatNumber">VAT Number</label>
+                                                <input asp-for="@Model.CertificateInfo.VatNumber" class="form-control form-control-sm" readonly />
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.DeviceBranchName">Device Branch Name</label>
+                                                <input asp-for="@Model.CertificateInfo.DeviceBranchName" class="form-control form-control-sm" readonly />
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.Email">Email</label>
+                                                <input asp-for="@Model.CertificateInfo.Email" class="form-control form-control-sm" readonly />
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.PhoneNo">PhoneNo</label>
+                                                <input asp-for="@Model.CertificateInfo.PhoneNo" class="form-control form-control-sm" readonly />
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.Province">Province</label>
+                                                <input asp-for="@Model.CertificateInfo.Province" class="form-control form-control-sm" readonly />
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.City">City</label>
+                                                <input asp-for="@Model.CertificateInfo.City" class="form-control form-control-sm" readonly />
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.Street">Street</label>
+                                                <input asp-for="@Model.CertificateInfo.Street" class="form-control form-control-sm" readonly />
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.HouseNo">House No</label>
+                                                <input asp-for="@Model.CertificateInfo.HouseNo" class="form-control form-control-sm" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Register Tab -->
+                                <div class="tab-pane fade" id="nav-register" role="tabpanel" aria-labelledby="nav-register-tab">
+                                    <div class="tab-container" style="border: var(--bs-card-border-width) solid var(--bs-card-border-color); border-radius: 4px; padding: 20px; margin-top: 10px;  margin-bottom: 10px;">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.DeviceCertificate">Generated CSR</label>
+                                                <textarea asp-for="@Model.CertificateInfo.GeneratedCSR" class="form-control form-control-sm" readonly></textarea>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.PrivateKey">Generated PrivateKey</label>
+                                                <textarea asp-for="@Model.CertificateInfo.PrivateKey" class="form-control form-control-sm" readonly></textarea>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.DeviceCertificate">Device Certificate</label>
+                                                <textarea asp-for="@Model.CertificateInfo.DeviceCertificate" class="form-control form-control-sm" readonly></textarea>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.Base64Pfx">Base64 Pfx</label>
+                                                <textarea asp-for="@Model.CertificateInfo.Base64Pfx" class="form-control form-control-sm" readonly></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Configuration Tab -->
+                                <div class="tab-pane fade" id="nav-configuration" role="tabpanel" aria-labelledby="nav-configuration-tab">
+                                    <div class="tab-container" style="border: var(--bs-card-border-width) solid var(--bs-card-border-color); border-radius: 4px; padding: 20px; margin-top: 10px; margin-bottom: 10px;">
+                                        <div class="row">
+
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-md-4 mb-3">
+                                                        <label class="form-label" asp-for="@Model.CertificateInfo.DeviceOperatingMode">Operating Mode</label>
+                                                        <input asp-for="@Model.CertificateInfo.DeviceOperatingMode" class="form-control form-control-sm" readonly />
+                                                    </div>
+                                                    <div class="col-md-4 mb-3">
+                                                        <label class="form-label" asp-for="@Model.CertificateInfo.TaxPayerDayMaxHrs">Day Max Hours</label>
+                                                        <input asp-for="@Model.CertificateInfo.TaxPayerDayMaxHrs" class="form-control form-control-sm" readonly />
+                                                    </div>
+                                                    <div class="col-md-4 mb-3">
+                                                        <label class="form-label" asp-for="@Model.CertificateInfo.TaxpayerDayEndNotificationHrs">End Notification Hours</label>
+                                                        <input asp-for="@Model.CertificateInfo.TaxpayerDayEndNotificationHrs" class="form-control form-control-sm" readonly />
+                                                    </div>
+                                                    <div class="col-md-12 mb-3">
+                                                        <label class="form-label" asp-for="@Model.CertificateInfo.ApplicableTaxes">Applicable Taxes</label>
+                                                        <input asp-for="@Model.CertificateInfo.ApplicableTaxes" class="form-control form-control-sm" readonly />
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-md-4 mb-3">
+                                                        <label class="form-label" asp-for="@Model.CertificateInfo.CertificateValidTill">Certificate Valid Till</label>
+                                                        <input class="form-control form-control-sm"
+                                                               readonly asp-for="@Model.CertificateInfo.CertificateValidTill" />
+                                                    </div>
+                                                    <div class="col-md-8 mb-3">
+                                                        <label class="form-label" asp-for="@Model.CertificateInfo.QrUrl">QR URL</label>
+                                                        <input asp-for="@Model.CertificateInfo.QrUrl" class="form-control form-control-sm" readonly />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12"><hr></div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6 offset-6 mb-3">
+                                                        <button type="submit" id="downloadCertificateButton" class="btn btn-primary btn-sm w-100">
+                                                            Download Certificate
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<div class="loading-indicator" id="loadingIndicator"></div>
+
+@section Scripts {
+
+    <script>
+        $(function () {
+            function showLoading() {
+                document.getElementById('loadingIndicator').style.display = 'block';
+            }
+
+            function hideLoading() {
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }
+
+            function enableButton(buttonId) {
+                $(buttonId).prop('disabled', false);
+            }
+
+            // Disable button
+            function disableButton(buttonId) {
+                $(buttonId).prop('disabled', true);
+            }
+
+
+            function setCommonName() {
+
+                var VerifyTaxPayerDto = {
+                    IntegrationType: $('#CertificateInfo_IntegrationType').val(),
+                    DeviceID: parseInt($('#CertificateInfo_DeviceID').val(), 10), 
+                    DeviceSerialNumber: $('#CertificateInfo_DeviceSerialNumber').val(),
+                    ActivationKey: $('#CertificateInfo_ActivationKey').val()
+                };
+
+                if (Object.values(VerifyTaxPayerDto).some(val => !val)) {
+                    disableButton(verifyTaxPayerButton);
+                    $("#CertificateInfo_CommonName").val('');
+                    return;
+                }
+
+                var deviceSNValue = $("#CertificateInfo_DeviceSerialNumber").val();
+                var deviceIdValue = $("#CertificateInfo_DeviceID").val();
+                var deviceIdString = String(deviceIdValue).padStart(10, '0');
+
+                if (deviceIdValue && deviceSNValue) {
+                    var csrCommonName = "ZIMRA-" + deviceSNValue + "-" + deviceIdString;
+                    $("#CertificateInfo_CommonName").val(csrCommonName);
+                }
+
+                enableButton(verifyTaxPayerButton);
+            }
+            
+            function updateControlAtribut(inputClass) {
+                var isReadonly = $('#CertificateInfo_Base64Pfx').val();
+                var specificInputs = document.querySelectorAll("." + inputClass);
+                specificInputs.forEach(function (input) {
+                    if (isReadonly) {
+                        input.setAttribute("readonly", "readonly");
+                    } else {
+                        input.removeAttribute("readonly");
+                    }
+                });
+            }
+
+            $("#generateCustomField").on('click', async function () {
+                try {
+                    showLoading();
+
+                    const apiEndpoint = 'http://127.0.0.1:55667/api2'; // API endpoint
+                    const apiToken = 'CgpaaW1yYSBGRE1TEhIJ52Y8vcwJEUYRg5R3NKKN9lAaEgmdiuVby0+cThGjKsDLjgJdkw=='; // API token
+
+                    if (!apiEndpoint || !apiToken) {
+                        alert('API Endpoint or Token is missing!');
+                        hideLoading();
+                        return;
+                    }
+
+                    const response = await fetch('GetCfData'); // Fetch JSON data
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch JSON data from the server.');
+                    }
+
+                    const jsonData = await response.json(); // Parse JSON response
+                    let successCount = 0, failureCount = 0;
+
+                    // Iterasi melalui semua key dan item dalam JSON
+                    for (const [key, items] of Object.entries(jsonData)) {
+                        for (const item of items) {
+                            const fullApiUrl = `${apiEndpoint}/${key}/key/${encodeURIComponent(item.Key)}`;
+
+                            try {
+                                const apiResponse = await fetch(fullApiUrl, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-API-KEY': apiToken
+                                    },
+                                    body: JSON.stringify(item)
+                                });
+
+                                if (apiResponse.ok) {
+                                    console.log(`Success: ${fullApiUrl}`);
+                                    successCount++;
+                                } else {
+                                    console.warn(`Failed: ${fullApiUrl}`);
+                                    failureCount++;
+                                }
+                            } catch (err) {
+                                console.error(`Error: ${fullApiUrl}`, err);
+                                failureCount++;
+                            }
+                        }
+                    }
+
+                    hideLoading();
+
+                    alert(`${successCount} successful, ${failureCount} failed.`);
+                } catch (err) {
+                    console.error('Error occurred:', err);
+                    hideLoading();
+                    alert('Error: ' + err.message);
+                }
+            });
+
+
+            $('#verifyTaxPayerButton').on('click', function () {
+                showLoading();
+
+                var VerifyTaxPayerDto = {
+                    IntegrationType: $('#CertificateInfo_IntegrationType').val(),
+                    DeviceID: parseInt($('#CertificateInfo_DeviceID').val(), 10),  // Convert to integer
+                    DeviceSerialNumber: $('#CertificateInfo_DeviceSerialNumber').val(),
+                    ActivationKey: $('#CertificateInfo_ActivationKey').val()
+                };
+
+                if (Object.values(VerifyTaxPayerDto).some(val => !val)) {
+                    hideLoading();
+                    alert("Please provide all required inputs for TaxPayer Verification Info.");
+                    return;
+                }
+
+                $.ajax({
+                    url: 'verifytaxpayer',  
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(VerifyTaxPayerDto, null, 2), 
+                    success: function (response) {
+                        // Check if response is a string and parse it
+                        if (typeof response === 'string') {
+                            console.log(response);
+                            response = JSON.parse(response);
+                        }
+                        // Set the values in the form
+                        $('#CertificateInfo_TaxPayerName').val(response.taxPayerName);
+                        $('#CertificateInfo_TaxPayerTIN').val(response.taxPayerTIN);
+                        $('#CertificateInfo_VatNumber').val(response.vatNumber);
+                        $('#CertificateInfo_DeviceBranchName').val(response.deviceBranchName);
+                        // Access nested properties
+                        var deviceBranchAddress = response.deviceBranchAddress;
+                        $('#CertificateInfo_Province').val(deviceBranchAddress.province);
+                        $('#CertificateInfo_City').val(deviceBranchAddress.city);
+                        $('#CertificateInfo_Street').val(deviceBranchAddress.street);
+                        $('#CertificateInfo_HouseNo').val(deviceBranchAddress.houseNo);
+                        // Access nested properties
+                        var deviceBranchContacts = response.deviceBranchContacts;
+                        $('#CertificateInfo_Email').val(deviceBranchContacts.email);
+                        $('#CertificateInfo_PhoneNo').val(deviceBranchContacts.phoneNo);
+
+                        disableButton('#verifyTaxPayerButton');
+                        enableButton('#registerDeviceButton');
+
+                        hideLoading();
+                    },
+                    error: function (xhr) {
+                        disableButton('#registerDeviceButton');
+                        hideLoading();
+                        console.log("Raw response:", xhr.responseText);
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            let errorDetails = errorResponse.errors ? JSON.parse(errorResponse.errors) : errorResponse;
+                            alert("Error Details:\n" + JSON.stringify(errorDetails, null, 2)); 
+                        } catch (e) {
+                            console.error("Parsing error:", e); 
+                            alert("Failed to parse JSON response. Raw response: " + xhr.responseText);
+                        }
+                    }
+                });
+            });
+
+
+            $('#registerDeviceButton').on('click', function () {
+                showLoading();
+
+                var DeviceRegistrationDto = {
+                    IntegrationType: $('#CertificateInfo_IntegrationType').val(),
+                    DeviceID: parseInt($('#CertificateInfo_DeviceID').val(), 10),  
+                    DeviceSerialNumber: $('#CertificateInfo_DeviceSerialNumber').val(),
+                    CommonName: $('#CertificateInfo_CommonName').val(), 
+                    DeviceModelName: $('#CertificateInfo_DeviceModelName').val(),
+                    DeviceModelVersion: $('#CertificateInfo_DeviceModelVersion').val(),
+                    ActivationKey: $('#CertificateInfo_ActivationKey').val()
+                };
+
+                if (Object.values(DeviceRegistrationDto).some(val => !val)) {
+                    hideLoading();
+                    alert("Please provide all required inputs for Device Registration.");
+                    return;
+                }
+
+                $.ajax({
+                    url: 'registerdevice',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(DeviceRegistrationDto, null, 2),
+                    success: function (response) {
+                        // Check if response is a string and parse it
+                        if (typeof response === 'string') {
+                            response = JSON.parse(response);
+                        }
+
+                        $('#CertificateInfo_GeneratedCSR').val(response.generatedCsr);
+                        $('#CertificateInfo_PrivateKey').val(response.privateKey);
+                        $('#CertificateInfo_DeviceCertificate').val(response.deviceCertificate);
+                        $('#CertificateInfo_Base64Pfx').val(response.base64Pfx);
+
+                        enableButton('#getConfigButton');
+                        disableButton('#registerDeviceButton');
+                        disableButton('#verifyTaxPayerButton');
+                        updateControlAtribut('readonly-control');
+
+                        hideLoading();
+                    },
+                    error: function (xhr) {
+                        disableButton('#getConfigButton');
+                        hideLoading();
+                        console.log("Raw response:", xhr.responseText); 
+
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            let errorDetails = errorResponse.errors ? JSON.parse(errorResponse.errors) : errorResponse;
+                            alert("Error Details:\n" + JSON.stringify(errorDetails, null, 2));
+                        } catch (e) {
+                            console.error("Parsing error:", e); // Log the error
+                            alert("Failed to parse JSON response. Raw response: " + xhr.responseText);
+                        }
+                    }
+                });
+            });
+
+
+            $('#getConfigButton').on('click', function () {
+
+                showLoading();
+
+                var GetConfigDto = {
+                    IntegrationType: $('#CertificateInfo_IntegrationType').val(),
+                    DeviceID: parseInt($('#CertificateInfo_DeviceID').val(), 10),  
+                    DeviceSerialNumber: $('#CertificateInfo_DeviceSerialNumber').val(),
+                    DeviceModelName: $('#CertificateInfo_DeviceModelName').val(),
+                    DeviceModelVersion: $('#CertificateInfo_DeviceModelVersion').val(),
+                    PrivateKey: $('#CertificateInfo_PrivateKey').val(),
+                    DeviceCertificate: $('#CertificateInfo_DeviceCertificate').val(),
+                    Base64Pfx: $('#CertificateInfo_Base64Pfx').val()
+                };
+
+                console.log(JSON.stringify(GetConfigDto, null, 2));
+
+                if (Object.values(GetConfigDto).some(val => !val)) {
+                    hideLoading();
+                    alert("Please provide all required inputs for Device Registration.");
+                    return;
+                }
+
+                $.ajax({
+                    url: 'getconfig',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(GetConfigDto, null, 2),
+                    success: function (response) {
+
+                        console.log(response);
+
+                        if (typeof response === 'string') {
+                            response = JSON.parse(response);
+                        }
+                        
+                        $('#CertificateInfo_DeviceOperatingMode').val(response.deviceOperatingMode);
+                        $('#CertificateInfo_ApplicableTaxes').val(response.applicableTaxes);
+                        $('#CertificateInfo_TaxPayerDayMaxHrs').val(response.taxPayerDayMaxHrs);
+                        $('#CertificateInfo_TaxpayerDayEndNotificationHrs').val(response.taxpayerDayEndNotificationHrs);
+
+                        const certificateValidTill = new Date(response.certificateValidTill); // DateTimeOffset dari server
+                        const formattedDate = certificateValidTill.toLocaleString(); // Mengonversi ke format lokal
+
+                        // Menampilkan di input form
+                        $('#CertificateInfo_CertificateValidTill').val(formattedDate);
+
+                        $('#CertificateInfo_QrUrl').val(response.qrUrl);
+
+                        enableButton('#downloadCertificateButton');
+                        hideLoading();
+                    },
+                    error: function (xhr) {
+                        disableButton('#downloadCertificateButton');
+                        hideLoading();
+                        console.log("Raw response:", xhr.responseText); 
+
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            let errorDetails = errorResponse.errors ? JSON.parse(errorResponse.errors) : errorResponse;
+                            alert("Error Details:\n" + JSON.stringify(errorDetails, null, 2)); 
+                        } catch (e) {
+                            console.error("Parsing error:", e); 
+                            alert("Failed to parse JSON response. Raw response: " + xhr.responseText); 
+                        }
+                    }
+                });
+            });
+            
+
+            $("#CertificateInfo_IntegrationType, #CertificateInfo_DeviceID, #CertificateInfo_DeviceSerialNumber, #CertificateInfo_ActivationKey").on('input', setCommonName);
+
+            disableButton('#verifyTaxPayerButton');
+            disableButton('#registerDeviceButton');
+            disableButton('#getConfigButton');
+            disableButton('#downloadCertificateButton');
+
+            updateControlAtribut('readonly-control');
+
+        });
+
+    </script>
+
+
+    <script type="text/javascript">
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            var isFileReady = '@Model.IsFileReady'.toLowerCase() === 'true';
+            var businessDetails = @Html.Raw(Json.Serialize(Model.BusinessDetailsJson));
+            var apiUrl = '@Model.Api' + '/business-details-form/38cf4712-6e95-4ce1-b53a-bff03edad273';
+            var secretKey = '@Html.Raw(@Model.Token)';
+
+            console.log(secretKey);
+
+            var fileData = '@Html.Raw(Model.FileContent)';
+            var fileName = '@Model.Filename';
+
+            var message = "";
+
+
+            if (isFileReady) {
+                var payload;
+                try {
+                    payload = JSON.parse(businessDetails);
+                    console.log('Parsed Payload:', payload);
+                } catch (error) {
+                    console.error("Error parsing businessDetails JSON:", error);
+                    message += `Error parsing businessDetails JSON: ${error.message}\n`;
+                    return;
+                }
+
+                if (payload) {
+                    fetch(apiUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            //'X-API-KEY': secretKey
+                            'Authorization': `Bearer ${secretKey}`
+                        },
+                        body: payload
+                    })
+                        .then(response => {
+                            console.log('Network Response Status:', response.status);
+                            return response.text().then(text => ({
+                                status: response.status,
+                                ok: response.ok,
+                                body: text
+                            }));
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                console.log('Update Zimra Reference successful!');
+                                message += 'Update Zimra Reference: successful\n';
+                            } else {
+                                console.error('Error response body:', response.body);
+                                message += `Update Zimra Reference Error: Network response was not ok. ${response.body}\n`;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Update Zimra Reference Error:', error.message);
+                            message += `Update Zimra Reference Error: ${error.message}\n`;
+                        })
+                        .finally(() => {
+                            if (isFileReady) {
+                                if (fileData && fileName) {
+                                    downloadFile(fileData, fileName);
+                                } else {
+                                    console.error('File data or filename is missing.');
+                                    message += 'File data or filename is missing.\n';
+                                }
+                            }
+                            alert(message);
+                        });
+                } else {
+                    console.error("Payload is null or undefined");
+                }
+            }
+        });
+
+        function downloadFile(base64Data, fileName) {
+            var binaryString = atob(base64Data);
+            var binaryLen = binaryString.length;
+            var bytes = new Uint8Array(binaryLen);
+
+            for (var i = 0; i < binaryLen; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+
+            var blob = new Blob([bytes], { type: "application/zip" });
+
+            var link = document.createElement("a");
+            var url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = fileName;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+    </script>
+
+}

@@ -1,0 +1,138 @@
+﻿@using Newtonsoft.Json
+@using ZimraEGS.Models
+@model OpenDayViewModel
+
+@{
+    ViewData["Title"] = "Zimra Integration";
+}
+
+<div class="container-fluid setup-container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Manager IO - Zimra Integration</h2>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8 mb-4">
+            <div class="card card-custom">
+                <div class="card-header section-header">
+                    <h5 class="mb-0">Open Device Fiscal Day</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Fiscal Day Status is currently closed. Please open the fiscal day to start reporting receipts.
+                    </p>
+                    <form id="openDayForm">
+                        <div class="mb-4 text-start">
+                            <label class="form-label">FiscalDay Status Response</label>
+                            <textarea class="form-control" id="textareaResponse" rows="10" readonly>@Html.Raw(Model.DeviceStatusJson))</textarea>
+                        </div>
+                        <input type="hidden" name="Base64Pfx" value="@Model.Base64Pfx" />
+                        <input type="hidden" name="DeviceID" value="@Model.DeviceID" />
+                        <input type="hidden" name="DeviceModelName" value="@Model.DeviceModelName" />
+                        <input type="hidden" name="DeviceModelVersion" value="@Model.DeviceModelVersion" />
+                        <input type="hidden" name="DeviceSerialNumber" value="@Model.DeviceSerialNumber" />
+                        <input type="hidden" name="LastFiscalDayNo" value="@Model.LastFiscalDayNo" />
+                        <input type="hidden" name="IntegrationType" value="@Model.IntegrationType" />
+                        <input type="hidden" name="BusinessDetailJson" value="@Model.BusinessDetailJson" />
+                        <input type="hidden" name="LastReceiptCounter" value="@Model.LastReceiptCounter" />
+                        <input type="hidden" name="LastReceiptHash" value="@Model.LastReceiptHash" />
+                        <input type="hidden" name="FiscalDayStatus" value="@Model.FiscalDayStatus" />
+                        <input type="hidden" name="LastReceiptGlobalNo" value="@Model.LastReceiptGlobalNo" />
+                        <input type="hidden" name="DeviceStatusJson" value="@Model.DeviceStatusJson" />
+                        <input type="hidden" name="Api" value="@Model.Api" />
+                        <input type="hidden" name="Token" value="@Model.Token" />
+                        <input type="hidden" name="Referrer" value="@Model.Referrer" />
+
+                        <div class="mb-3 d-flex justify-content-between">
+                            <button type="button" id="backToManager" class="btn btn-secondary btn-sm" style="width: 200px;" name="backToManager" onclick="window.location.href='@Model.Referrer'">Back to Manager</button>
+                            <button type="button" id="openDayButton" class="btn btn-primary btn-sm" style="width: 200px;">
+                                Open Fiscal Day
+                                <i class="fa fa-spinner hidden" style="margin-left: 8px;"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="loading-indicator" id="loadingIndicator" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#openDayButton').click(function (e) {
+                e.preventDefault();
+                var $btn = $(this);
+                var spinner = $btn.find('.fa-spinner');
+                spinner.removeClass('hidden');
+
+                var formData = $('#openDayForm').serialize(); // Serialize the form data
+
+                $.ajax({
+                    url: '@Url.Action("AjaxOpenDay")',
+                    method: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        console.log(response);
+                        try {
+                            if (typeof response === 'string') {
+                                response = JSON.parse(response);
+                            }
+
+                            var message = "";
+
+                            // Process API reference update
+                            if (response.ApiReference) {
+                                const apiRef = response.ApiReference;
+
+                                console.log(JSON.stringify(apiRef.Payload))
+
+                                fetch(apiRef.ApiUrl, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${apiRef.SecretKey}`
+                                    },
+                                    body: apiRef.Payload
+                                }).then(apiRefResponse => {
+                                    if (apiRefResponse.ok) {
+                                        console.log('Update Zimra Reference successful!');
+                                        message += 'Update Zimra Reference: successful\n';
+                                    } else {
+                                        message += 'Update Zimra Reference Error: Network response was not ok.\n';
+                                    }
+                                }).catch(error => {
+                                    console.error(`Update Zimra Reference Error: ${error.message}`);
+                                    message += `Update Zimra Reference Error: ${error.message}\n`;
+                                });
+                            }
+
+                            // Display response in textarea
+                            var formattedJson = JSON.stringify(response, null, 4);
+                            $('#textareaResponse').val(formattedJson);
+
+                            // Update button states dynamically
+                            $('#openDayButton').addClass('d-none'); // Hide Open Day button
+                            $('#closeDayButton').removeClass('d-none'); // Show Close Day button
+                        } catch (err) {
+                            $('#textareaResponse').val('Error processing response: ' + err.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $('#textareaResponse').val('Error: ' + xhr.responseText);
+                    },
+                    complete: function () {
+                        spinner.addClass('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+}

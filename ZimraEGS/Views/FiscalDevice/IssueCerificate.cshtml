@@ -1,0 +1,142 @@
+﻿@using Newtonsoft.Json
+@model CertInfoViewModel
+
+@{
+    ViewData["Title"] = "Zimra Integration Setup";
+    TimeSpan dateDifference = (Model.CertificateInfo.CertificateValidTill - DateTimeOffset.Now);
+    double dateDiff = dateDifference.TotalDays;
+}
+
+<div class="container-fluid setup-container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Manager IO - Zimra Integration</h2>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8 mb-4">
+            <div class="card card-custom">
+                <div class="card-header section-header">
+                    <h5 class="mb-0">Issue Certificate</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Device Certificate will be Expired in @Html.Raw(dateDiff) days.
+                        Click Issue Certificate Button to do Certificate Renewal
+                    </p>
+                    <div class="mb-4 text-start">
+                        <label class="form-label">Certificate Info</label>
+                        <textarea class="form-control" id="textareaResponse" rows="10" readonly>@Html.Raw(JsonConvert.SerializeObject(Model.CertificateInfo, Formatting.Indented))
+                        </textarea>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-between">
+                        <button type="button"
+                                id="backToManager"
+                                class="btn btn-secondary btn-sm"
+                                style="width: 200px;"
+                                name="backToManager"
+                                onclick="window.location.href='@Model.Referrer'">
+                            Back to Manager
+                        </button>
+                        <button type="button"
+                                id="issueCertificateButton"
+                                class="btn btn-primary btn-sm"
+                                style="width: 200px;">
+                                Issue Certificate
+                            <i class="fa fa-spinner hidden" style="margin-left: 8px;"></i>
+                        </button>
+                    </div>
+                     
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="loading-indicator" id="loadingIndicator" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function showLoading() {
+                $('#loadingIndicator').fadeIn();
+            }
+
+            function hideLoading() {
+                $('#loadingIndicator').fadeOut();
+            }
+
+            $('#issueCertificateButton').click(async function (e) {
+                e.preventDefault();
+
+                const $btn = $(this);
+                const spinner = $btn.find('.fa-spinner');
+                spinner.removeClass('hidden');
+
+                const formData = $('form').serialize();
+
+                try {
+                    const response = await $.ajax({
+                        url: '@Url.Action("AjaxIssueCertificate")',
+                        method: 'POST',
+                        data: formData
+                    });
+
+                    // Parse response
+                    if (typeof response === 'string') {
+                        response = JSON.parse(response);
+                    }
+
+                    let message = '';
+
+                    if (response.ApiReference) {
+                        const apiRef = response.ApiReference;
+
+                        try {
+                            const apiRefResponse = await fetch(apiRef.ApiUrl, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${apiRef.SecretKey}`
+                                },
+                                body: apiRef.Payload
+                            });
+
+                            if (apiRefResponse.ok) {
+                                console.log('Update Zimra Reference successful!');
+                                message += 'Update Zimra Reference: successful\n';
+                            } else {
+                                message += 'Update Zimra Reference Error: Network response was not ok.\n';
+                            }
+                        } catch (error) {
+                            console.error(`Update Zimra Reference Error: ${error.message}`);
+                            message += `Update Zimra Reference Error: ${error.message}\n`;
+                        }
+                    }
+
+                    const formattedJson = JSON.stringify(response.CertificateInfo, null, 4);
+                    $('#textareaResponse').val(formattedJson);
+
+                    console.log('Issue Certificate completed successfully!');
+
+                    // Disable the button after successful operation
+                    if (response.IssueCertificateResponse && response.IssueCertificateResponse.success) { // Adjust "success" to the actual success flag from your API response
+                        console.log('Issue Certificate completed successfully!');
+                        $btn.prop('disabled', true); // Disable the button
+                        $btn.text('Issue Certificate'); // Optionally update the button text
+                    }
+
+                } catch (error) {
+                    $('#textareaResponse').val('Error: ' + error.message);
+                    console.error('Error processing request:', error);
+                } finally {
+                    spinner.addClass('hidden');
+                }
+            });
+        });
+    </script>
+}

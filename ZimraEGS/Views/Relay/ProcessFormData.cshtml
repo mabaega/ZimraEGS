@@ -1,0 +1,570 @@
+﻿@using Newtonsoft.Json
+@using ZimraEGS.Helpers
+@using ZimraEGS.Models
+@model RelayDataViewModel
+
+@{
+    Layout = null;
+    var apiReference = Newtonsoft.Json.JsonConvert.SerializeObject(TempData["ApiReference"]);
+    var apiInvoice = Newtonsoft.Json.JsonConvert.SerializeObject(TempData["ApiInvoice"]);
+}
+
+@functions {
+    public string GetFiscalDayStatusColor(Zimra.ApiClient.Enums.FiscalDayStatus status)
+    {
+        return status switch
+        {
+            Zimra.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed => "bg-danger text-white", // Red with white text
+            Zimra.ApiClient.Enums.FiscalDayStatus.FiscalDayOpened => "bg-success text-white", // Green with white text
+            _ => "bg-warning text-dark" // Yellow with dark text
+        };
+    }
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice Reporting - ZimraEGS</title>
+    <link rel="apple-touch-icon" sizes="60x60" href="~/images/logo.png">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <script src="~/js/color-modes.js"></script>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+    <script src="~/js/qrcode.js"></script>
+</head>
+
+<body class="d-flex flex-column min-vh-100 bg-tertiary">
+
+    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+        <symbol id="check2" viewBox="0 0 16 16">
+            <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z">
+            </path>
+        </symbol>
+        <symbol id="circle-half" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"></path>
+        </symbol>
+        <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+            <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z">
+            </path>
+            <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z">
+            </path>
+        </symbol>
+        <symbol id="sun-fill" viewBox="0 0 16 16">
+            <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z">
+            </path>
+        </symbol>
+    </svg>
+
+    <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
+
+        <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button"
+                aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (light)">
+            <svg class="bi my-1 theme-icon-active" width="1em" height="1em">
+                <use href="#sun-fill"></use>
+            </svg>
+            <span class="visually-hidden" id="bd-theme-text">Toggle theme</span>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
+            <li>
+                <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="light" aria-pressed="true">
+                    <svg class="bi me-2 opacity-50" width="1em" height="1em">
+                        <use href="#sun-fill"></use>
+                    </svg>
+                    Light
+                    <svg class="bi ms-auto d-none" width="1em" height="1em">
+                        <use href="#check2"></use>
+                    </svg>
+                </button>
+            </li>
+            <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                    <svg class="bi me-2 opacity-50" width="1em" height="1em">
+                        <use href="#moon-stars-fill"></use>
+                    </svg>
+                    Dark
+                    <svg class="bi ms-auto d-none" width="1em" height="1em">
+                        <use href="#check2"></use>
+                    </svg>
+                </button>
+            </li>
+            <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto"
+                        aria-pressed="false">
+                    <svg class="bi me-2 opacity-50" width="1em" height="1em">
+                        <use href="#circle-half"></use>
+                    </svg>
+                    Auto
+                    <svg class="bi ms-auto d-none" width="1em" height="1em">
+                        <use href="#check2"></use>
+                    </svg>
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <main class="flex-grow-1 d-flex align-items-center justify-content-center">
+        <div class="container rounded text-center">
+            <form id="relayForm" method="POST">
+                <div class="container">
+                    <div class="text-center pb-1">
+                        <img src="~/images/logo.png" alt="ZimraEGS" class="img-fluid" style="max-width: 60px;" />
+                        <h3 class="mb-1">Manager Io - Zimra eInvoice Reporting</h3>
+                        <p class="lead" style="color:var(--bs-danger);">"The process cannot be undone, please ensure that the Invoice to be processed is correct and error-free."</p>
+                    </div>
+                </div>
+
+                <hr />
+
+                <!-- Page content-->
+
+                <div class="row">
+
+                    <div class="col-lg-9">
+
+                        <div class="card mb-4">
+                            <div class="card-header"><h5>Receipt Info</h5></div>
+                            <div class="card-body" style="min-height: 605px;">
+
+                                <div class="row">
+
+                                    <div class="col-md-6">
+                                        <div class="mb-2">
+                                            <label for="BuyerRegisterName" class="form-label">Buyer Register Name:</label>
+                                            <input type="text" class="form-control form-control-sm text-center" id="BuyerRegisterName" name="BuyerRegisterName" value="@Model.BuyerRegisterName" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="mb-2">
+                                            <label for="FiscalDayNo" class="form-label">FiscalDay No:</label>
+                                            <input type="text" class="form-control form-control-sm text-center" id="FiscalDayNo" name="FiscalDayNo" value="@Model.FiscalDayNo" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="mb-2">
+                                            <label for="ReceiptType" class="form-label">Receipt Type:</label>
+                                            <input type="text" class="form-control form-control-sm text-center" id="ReceiptType" name="ReceiptType" value="@Model.ReceiptType" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="mb-2">
+                                            <label for="InvoiceNumber" class="form-label">Invoice No:</label>
+                                            <input type="text" class="form-control form-control-sm text-center" id="InvoiceNumber" name="InvoiceNumber" value="@Model.InvoiceNumber" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-2">
+                                            <label for="InvoiceDate" class="form-label">Receipt Date:</label>
+                                            <input type="text" class="form-control form-control-sm text-center" id="InvoiceDate" name="InvoiceDate" value="@Model.InvoiceDate" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="mb-2">
+                                            <label for="ReceiptGlobalNo" class="form-label">Receipt Global No:</label>
+                                            <input type="text" class="form-control form-control-sm text-center" id="ReceiptGlobalNo" name="ReceiptGlobalNo" value="@Model.ReceiptGlobalNo" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="mb-2">
+                                            <label for="ReceiptCounter" class="form-label">Receipt Counter No:</label>
+                                            <input type="text" class="form-control form-control-sm text-center" id="ReceiptCounter" name="ReceiptCounter" value="@Model.ReceiptCounter" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="mb-2">
+                                            <label for="CurrencyCode" class="form-label">Currency Code:</label>
+                                            <input type="text" class="form-control form-control-sm text-center" id="CurrencyCode" name="CurrencyCode" value="@Model.CurrencyCode" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-2">
+                                            <label for="amount" class="form-label">Amount:</label>
+                                            @Html.EditorFor(model => model.Amount, new { htmlAttributes = new { @class = "form-control form-control-sm right-align", @readonly = "readonly" } })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-2">
+                                            <label for="taxAmount" class="form-label">Tax Amount:</label>
+                                            @Html.EditorFor(model => model.TaxAmount, new { htmlAttributes = new { @class = "form-control form-control-sm right-align", @readonly = "readonly" } })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-2">
+                                            <label for="totalAmount" class="form-label">Total Amount:</label>
+                                            @Html.EditorFor(model => model.AmountWithTax, new { htmlAttributes = new { @class = "form-control form-control-sm right-align", @readonly = "readonly" } })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Include hidden inputs for all other required fields -->
+                                <input type="hidden" name="Referrer" value="@Model.Referrer" />
+                                <input type="hidden" name="FormKey" value="@Model.FormKey" />
+                                <input type="hidden" name="Api" value="@Model.Api" />
+                                <input type="hidden" name="Token" value="@Model.Token" />
+
+                                <input type="hidden" name="BusinessDetailJson" value="@Model.BusinessDetailJson" />
+                                <input type="hidden" name="InvoiceJson" value="@Model.InvoiceJson" />
+
+                                <input type="hidden" name="FiscalDaySummaryJson" value="@Model.FiscalDaySummaryJson" />
+                                <input type="hidden" name="BusinessReferenceJson" value="@Model.BusinessReferenceJson" />
+                                <input type="hidden" name="InvoiceReferenceJson" value="@Model.InvoiceReferenceJson" />
+                                <input type="hidden" name="ReceiptJson" value="@Model.ReceiptJson" />
+
+                                <input type="hidden" name="DeviceID" value="@Model.DeviceID" />
+                                <input type="hidden" name="DeviceSN" value="@Model.DeviceSN" />
+                                <input type="hidden" name="DeviceModelName" value="@Model.DeviceModelName" />
+                                <input type="hidden" name="DeviceModelVersion" value="@Model.DeviceModelVersion" />
+                                
+                                <input type="hidden" name="Base64Pfx" value="@Model.Base64Pfx" />
+                                <input type="hidden" name="PrivateKey" value="@Model.PrivateKey" />
+                                <input type="hidden" name="IntegrationType" value="@Model.IntegrationType" />
+
+                                <input type="hidden" name="ReceiptNotes" value="@Model.ReceiptNotes" />
+                                <input type="hidden" name="DeviceIDRef" value="@Model.DeviceIDRef" />
+                                <input type="hidden" name="DeviceSNRef" value="@Model.DeviceSNRef" />
+                                <input type="hidden" name="FiscalDayNoRef" value="@Model.FiscalDayNoRef" />
+                                <input type="hidden" name="ReceiptCounterRef" value="@Model.ReceiptCounterRef" />
+                                <input type="hidden" name="ReceiptGlobalNoRef" value="@Model.ReceiptGlobalNoRef" />
+                                <input type="hidden" name="ReceiptRefNo" value="@Model.ReceiptRefNo" />
+                                <input type="hidden" name="ReceiptRefDate" value="@Model.ReceiptRefDate" />
+
+                                <input type="hidden" name="ReceiptQrCode" value="@Model.ReceiptQrCode" />
+                                <input type="hidden" name="ReceiptHash" value="@Model.ReceiptHash" />
+                                <input type="hidden" name="ReceiptSignature" value="@Model.ReceiptSignature" />
+                                <input type="hidden" name="ReceiptVerificationCode" value="@Model.ReceiptVerificationCode" />
+
+                                <input type="hidden" name="FiscalDayOpened" value="@Model.FiscalDayOpened" />
+                                <input type="hidden" name="InvoiceTotal" value="@Model.InvoiceTotal" />
+                                <input type="hidden" name="TmpReceiptVerificationCode" value="@Model.TmpReceiptVerificationCode" />
+                                
+                                <hr style="margin: 5px 0px;" />
+
+                                <!-- Tab Navigation -->
+                                <ul class="nav nav-tabs" id="nav-tab" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="nav-manager-tab" data-bs-toggle="tab" href="#nav-manager" role="tab" aria-controls="nav-manager" aria-selected="true">Manager Invoice</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="nav-json-tab" data-bs-toggle="tab" href="#nav-json" role="tab" aria-controls="nav-json" aria-selected="false">Zimra Receipt</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="nav-response-tab" data-bs-toggle="tab" href="#nav-response" role="tab" aria-controls="nav-response" aria-selected="false">Server Response</a>
+                                    </li>
+                                </ul>
+                                <!-- End Tab Navigation -->
+                                <!-- Tab Content -->
+                                <div class="tab-content" id="nav-tabContent">
+                                    <div class="tab-pane fade" id="nav-manager" role="tabpanel" aria-labelledby="nav-manager-tab">
+                                        <div class="mb-2">
+                                            <textarea class="form-control form-control-sm" id="textareaManager" name="Base64Invoice" rows="10" readonly wrap="off" style="margin-top: 10px; min-height: 200px;">
+                                                @{
+                                                    if (Model.InvoiceJson != null)
+                                                    {
+                                                        try
+                                                        {
+                                                            var formattedJson = DocumentFormatter.SerializeObject(JsonConvert.DeserializeObject(Model.InvoiceJson));
+                                                            @Html.Raw(formattedJson)
+                                                            ;
+                                                        }
+                                                        catch (Exception ex)
+                                                        {
+                                                            <text>Error processing the Manager invoice: @ex.Message</text>
+                                                            ;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>No data available</text>
+                                                        ;
+                                                    }
+                                                }
+                                        </textarea>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="nav-json" role="tabpanel" aria-labelledby="nav-json-tab">
+                                        <div class="mb-2">
+                                            <textarea class="form-control form-control-sm" id="textareaUbl" name="Receipt" rows="10" readonly wrap="off" style="margin-top: 10px; min-height: 200px;">
+                                                @{
+                                                    if (Model.ReceiptJson != null)
+                                                    {
+                                                        try
+                                                        {
+                                                            var formattedJson = DocumentFormatter.SerializeObject(JsonConvert.DeserializeObject(Model.ReceiptJson));
+                                                            @Html.Raw(formattedJson)
+                                                            ;
+                                                        }
+                                                        catch (Exception ex)
+                                                        {
+                                                            <text>Error processing the Receipt: @ex.Message</text>
+                                                            ;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>No data available</text>
+                                                        ;
+                                                    }
+                                                }
+                                        </textarea>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade show active" id="nav-response" role="tabpanel" aria-labelledby="nav-response-tab">
+                                        <div class="mb-2">
+                                            <textarea class="form-control form-control-sm" id="textareaResponse" name="PortalResult" rows="10" readonly wrap="off" style="margin-top: 10px; min-height: 200px;">
+                                                
+                                        </textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End Tab Content -->
+
+                                <hr />
+
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <button type="button" class="btn btn-secondary mt-1" onclick="window.location.href='@Model.Referrer'">Back to Manager</button>
+                                    </div>
+
+                                    <div id="buttonsContainer">
+
+                                        @if (string.IsNullOrEmpty(Model.ReceiptVerificationCode) & (Model.FiscalDayStatus != Zimra.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed))
+                                        {
+                                            <button id="submitReceiptButton" class="btn btn-info mt-1">
+                                                <i class="fas fa-spinner fa-spin hidden"></i>
+                                                Submit Receipt
+                                            </button>
+                                        }
+
+                                        <!-- Dynamic Button Here -->
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-3">
+                        <!-- Side widget -->
+                        <div class="card mb-4">
+                            <div class="card-header text-center">
+                                <h5>Device Info</h5>
+                            </div>
+                            <div class="card-body" style="min-height: 605px;">
+                                <!-- Device Information -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between">
+                                        <span><strong>Device ID:</strong></span>
+                                        <span>@Model.DeviceID.ToString().PadLeft(10,'0')</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span><strong>Device Serial Number:</strong></span>
+                                        <span>@Model.DeviceSN</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span><strong>Fiscal Day Status:</strong></span>
+                                        <span class="badge @GetFiscalDayStatusColor(Model.FiscalDayStatus)">
+                                            @Model.FiscalDayStatus
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Fiscal Day Buttons -->
+                                <div id="fisacalButtonContainar" class="text-center mb-4">
+                                    <button id="openDayButton" class="btn btn-info @((Model.FiscalDayStatus == Zimra.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed) ? "" : "d-none" )">
+                                        <i class="fas fa-spinner fa-spin hidden"></i> Open Fiscal Day
+                                    </button>
+                                    <button id="closeDayButton" class="btn btn-info @((Model.FiscalDayStatus != Zimra.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed) ? "" : "d-none")">
+                                        <i class="fas fa-spinner fa-spin hidden"></i> Close Fiscal Day
+                                    </button>
+                                </div>
+
+                                <hr />
+
+                                <!-- QR Code Section -->
+                                <div id="qrCodeImage"
+                                     style="background-color: white; width: 140px; height: 140px; margin: 0 auto; border: 1px solid var(--bs-border-color-translucent); display: flex; align-items: center; justify-content: center;">
+                                    <!-- QR code image will render here -->
+                                </div>
+
+                                <div class="text-break"
+                                     style="margin-top: 15px; word-wrap: break-word; overflow-wrap: break-word; font-family: monospace; border: 1px solid var(--bs-border-color-translucent); padding: 8px; border-radius: 5px;background-color: var(--bs-card-cap-bg);">
+                                    @if (!string.IsNullOrEmpty(Model.ReceiptQrCode))
+                                    {
+                                        <a href="@Model.ReceiptQrCode" target="_blank" style="color: inherit; text-decoration: none;">
+                                            @Html.Raw(Model.ReceiptQrCode)
+                                        </a>
+                                    }
+                                </div>
+
+                                <!-- Server Signature Section -->
+                                @if (!string.IsNullOrEmpty(Model.ReceiptVerificationCode))
+                                {
+                                    <div class="text-center mb-3" style="margin-top: 15px;">
+                                        <strong>Server Signature:</strong>
+                                    </div>
+                                    <div class="text-break"
+                                         style="word-wrap: break-word; overflow-wrap: break-word; font-family: monospace; border: 1px solid var(--bs-border-color-translucent); padding: 8px; border-radius: 5px; height: 100px; background-color: var(--bs-card-cap-bg);">
+                                        @Model.ReceiptVerificationCode
+                                    </div>
+                                }
+
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </form>
+        </div>
+    </main>
+
+
+    <div id="progress" style="display: none;">Processing...</div>
+
+    <footer class="footer py-3 bg-body-tertiary">
+        <div class="container text-center">
+            <span class="text-body-secondary">ZimraEGS @VersionHelper.GetVersion() </span>
+        </div>
+    </footer>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+            $('#submitReceiptButton').click(function (e) {
+                e.preventDefault();
+
+                var $btn = $(this);
+                $btn.find('.fa-spinner').removeClass('hidden');
+
+                var formData = $('form').serialize();
+
+                $.ajax({
+                    url: '@Url.Action("AjaxSubmitReceipt")',
+                    method: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        //console.log(response);
+                        try {
+                            if (typeof response === 'string') {
+                                response = JSON.parse(response);
+                            }
+
+                          var message = "";
+
+                            // Process API reference update
+                            if (response.ApiReference) {
+
+                                const apiRef = response.ApiReference;
+
+                                fetch(apiRef.ApiUrl, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${apiRef.SecretKey}`
+                                    },
+                                    body: apiRef.Payload
+                                }).then(apiRefResponse => {
+                                    if (apiRefResponse.ok) {
+                                        console.log('Update Zimra Reference successful!');
+                                        message += 'Update Zimra Reference: successful\n';
+                                    } else {
+                                        message += 'Update Zimra Reference Error: Network response was not ok.\n';
+                                    }
+                                }).catch(error => {
+                                    console.error(`Update Zimra Reference Error: ${error.message}`);
+                                    message += `Update Zimra Reference Error: ${error.message}\n`;
+                                });
+                            }
+
+                            // Process API invoice update
+                            if (response.ApiInvoice) {
+                                const apiInvoice = response.ApiInvoice;
+
+                                fetch(apiInvoice.ApiUrl, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${apiInvoice.SecretKey}`
+                                    },
+                                    body: apiInvoice.Payload
+                                }).then(apiInvoiceResponse => {
+                                    if (apiInvoiceResponse.ok) {
+                                        console.log('Update Invoice Data successful!');
+                                        message += 'Update Invoice Data: successful\n\n';
+                                    } else {
+                                        message += 'Update Invoice Error: Network response was not ok.\n';
+                                    }
+                                }).catch(error => {
+                                    console.error(`Update Invoice Error: ${error.message}`);
+                                    message += `Update Invoice Error: ${error.message}\n`;
+                                });
+                            }
+
+                            // Display the response in the textarea
+                            var formattedJson = JSON.stringify(response.SubmitReceiptResponse, null, 4);
+                            $('#textareaResponse').val(formattedJson);
+
+                            $btn.hide();
+
+                        } catch (err) {
+                            console.error('Error processing response:', err);
+                            $('#textareaResponse').val('Error processing response: ' + err.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $('#textareaResponse').val('Error: ' + xhr.responseText);
+                    },
+                    complete: function () {
+                        $btn.find('.fa-spinner').addClass('hidden');
+                    }
+                });
+            });
+
+            $(document).on('click', '#submitReceiptButton, #openDayButton', function () {
+                var $btn = $(this);
+                $btn.find('.fa-spinner').removeClass('hidden');
+            });
+
+            function generateQRCode(text) {
+                new QRCode(document.getElementById("qrCodeImage"), {
+                    text: text,
+                    width: 120,
+                    height: 120,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.L
+                });
+            }
+
+            var ZimraQRCode = "@Model.ReceiptQrCode".replace(/&#x2B;/g, '+');
+            generateQRCode(ZimraQRCode);
+        });
+
+    </script>
+
+</body>
+</html>

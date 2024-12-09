@@ -1,0 +1,464 @@
+{
+  "credit-note-footer-form": [
+    {
+      "Content": "<script src=\"resources/qrcode/qrcode.js\"></script>",
+      "Key": "29fd5925-5e6c-4c3b-99dc-2d64b07abade",
+      "Name": "QRCode"
+    }
+  ],
+  "number-custom-field-form": [
+    {
+      "DisplayOnView": true,
+      "Key": "d08c8744-486f-470d-82d1-29b1a1cb06ae",
+      "Name": "Device ID",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 40
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "a9867045-740b-493f-8b67-43b6da07e41e",
+      "Name": "ReceiptCounter",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 44
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "c6e40e7a-974e-4ffc-9c76-1c1ecfd05693",
+      "Name": "FiscalDayNo",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 42
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "ff05ca33-3dae-4b97-90ee-73901c7a51d7",
+      "Name": "ReceiptRefNo",
+      "Placement": [
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 49
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "4712e5df-c5e3-4b6e-9746-8ebb58a81dee",
+      "Name": "ReceiptGlobalNo",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 43
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "980cd617-4173-4b1a-b310-f8fe36ceed52",
+      "Name": "ReceiptGlobalNoRef",
+      "Placement": [
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 48
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "de2ba4f5-baa3-45b7-86d4-716fb923557e",
+      "Name": "ReceiptCounterRef",
+      "Placement": [
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 47
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "770e9cdb-9f55-497a-923a-f8cef6b93595",
+      "Name": "FiscalDayNoRef",
+      "Placement": [
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 46
+    },
+    {
+      "Key": "f3a2f5dd-8da8-4701-b8d5-be5877792a79",
+      "Name": "Amount 2",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 28
+    },
+    {
+      "Key": "e2ab11ef-73e2-4ea4-802f-55b8c834037d",
+      "Name": "Amount 1",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 26
+    }
+  ],
+  "sales-invoice-footer-form": [
+    {
+      "Content": "<script src=\"resources/qrcode/qrcode.js\"></script>",
+      "Key": "8a7cf08c-58a1-408d-9ef6-1ed9fa621638",
+      "Name": "QRCode"
+    }
+  ],
+  "tax-code-form": [
+    {
+      "Key": "51285cd8-0cfb-402c-9a3b-b1775cd16ce6",
+      "Label": "Non-VAT WHT",
+      "Name": "Non-VAT Withholding Tax | 514 | WHT",
+      "Rate": 5,
+      "TaxRate": "CustomRate",
+      "Type": "SingleRate"
+    },
+    {
+      "Key": "d45ffe42-182a-4920-a5c6-dd2fd983794a",
+      "Label": "15% VAT",
+      "Name": "Standard rated 15%) | 3 | C",
+      "Rate": 15,
+      "TaxRate": "CustomRate",
+      "Type": "SingleRate"
+    },
+    {
+      "Key": "693aa908-e2ae-4a4a-997f-b23cc056d7fd",
+      "Label": "0% VAT",
+      "Name": "Zero rated 0% | 2 | B",
+      "Rate": 0.0,
+      "TaxRate": "CustomRate",
+      "Type": "SingleRate"
+    },
+    {
+      "Key": "6d0a93d1-a251-4509-94d2-9c1b2ade93b3",
+      "Label": "VAT (Exempt)",
+      "Name": "Exempt | 1 | A",
+      "Rate": 0.0,
+      "TaxRate": "CustomRate",
+      "Type": "SingleRate"
+    }
+  ],
+  "text-custom-field-form": [
+    {
+      "DisplayOnView": true,
+      "Key": "a0454495-cae8-43ef-a418-4dad69427e78",
+      "Name": "Verification Code",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 38,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "a360538c-ebe9-49e9-8cf8-fccd51320380",
+      "Name": "Device SN",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 41
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "cf2ccb83-64ae-4cbb-9fab-b774bdf83c95",
+      "Name": "ReceiptRefDate",
+      "Placement": [
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 50
+    },
+    {
+      "Key": "75190339-992a-4fb0-bf79-f5f8226edb4b",
+      "Name": "Receipt Reference",
+      "Description": "<script>\ndocument.addEventListener('DOMContentLoaded', function () {\n    const MakeHidden = labels => updateFields(labels, 'hide');\n\tconst MakeReadonly = labels => updateFields(labels, 'readonly');\n\tconst MakeReadonlyAndHide = labels => updateFields(labels, 'readonlyandhide');\n\tfunction updateFields(labels, action) {\n\t\tconst customFieldset = [...document.querySelectorAll('fieldset')].find(fieldset => fieldset.querySelector('legend')?.textContent.trim() === 'Custom Fields');\n\t\tif (!customFieldset) return console.error('Custom Fields fieldset not found');\n\t\tcustomFieldset.querySelectorAll('.form-group').forEach(group => {\n\t\t\tconst label = group.querySelector('label'), input = group.querySelector('input, textarea'), dropdown = group.querySelector('.vs__dropdown-toggle');\n\t\t\tif (label && labels.includes(label.textContent.trim())) {\n\t\t\t\tif (action === 'hide') group.style.display = 'none';\n\t\t\t\telse if (action === 'readonly' && input) input.setAttribute('readonly', 'true');\n\t\t\t\telse if (action === 'readonlyandhide') { if (input) input.setAttribute('readonly', 'true'); group.style.display = 'none'; }\n\t\t\t\tif (dropdown) {\n\t\t\t\t\tconst searchInput = dropdown.querySelector('input.vs__search'), clearButton = dropdown.querySelector('.vs__clear');\n\t\t\t\t\tif (action === 'readonly' || action === 'readonlyandhide') {\n\t\t\t\t\t\tdropdown.setAttribute('disabled', 'true');\n\t\t\t\t\t\tif (searchInput) searchInput.setAttribute('readonly', 'true');\n\t\t\t\t\t\tif (clearButton) clearButton.style.display = 'none';\n\t\t\t\t\t\tdropdown.style.pointerEvents = 'none';\n\t\t\t\t\t}\n\t\t\t\t\tif (action === 'hide' || action === 'readonlyandhide') dropdown.style.pointerEvents = 'none';\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t}\n    MakeReadonly(['Receipt QRCode', 'Verification Code', 'Receipt Reference']);\n    MakeReadonlyAndHide(['Device ID', 'Device SN','ReceiptCounter','ReceiptGlobalNo','FiscalDayNo']);\n});\n</script>",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 100,
+      "Size": "Large",
+      "Type": "ParagraphText"
+    },
+    {
+      "Key": "f7214db4-6726-4aa9-b5cd-3ff90ce9ba6c",
+      "Name": "Business Reference",
+      "Placement": [
+        "38cf4712-6e95-4ce1-b53a-bff03edad273"
+      ],
+      "Position": 1,
+      "Size": "Large",
+      "Type": "ParagraphText"
+    },
+    {
+      "Key": "0f0bf167-4b63-493d-ab45-049a76a07f46",
+      "Name": "FiscalDaySummary",
+      "Placement": [
+        "38cf4712-6e95-4ce1-b53a-bff03edad273"
+      ],
+      "Position": 44,
+      "Size": "Large",
+      "Type": "ParagraphText"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "6a347c55-735a-4a38-8cf6-0db93dce2ded",
+      "Name": "Certificate Info",
+      "Placement": [
+        "38cf4712-6e95-4ce1-b53a-bff03edad273"
+      ],
+      "Position": 10,
+      "Size": "Large",
+      "Type": "ParagraphText"
+    },
+    {
+      "Key": "329de867-9cf1-4dfe-8b06-5084bce788c7",
+      "Name": "HSCode",
+      "Placement": [
+        "0dbdbf8a-d80c-48e6-b453-bb7862445b7c",
+        "7affe9ee-731f-4936-8acf-15cae7bcacee",
+        "efc4f2cc-acf0-4815-a9a8-13bae00c6167",
+        "c37e4421-591a-4440-90ef-c5c9421e7948",
+        "4f819a77-dabc-4e28-8c99-172a1f595f3f"
+      ],
+      "Position": 0
+    },
+    {
+      "Key": "5b3ebf5f-ad4f-4ffc-84d1-abda67a7d294",
+      "Name": "Payment Type 1",
+      "OptionsForDropdownList": "0 | Cash\n1 | Card\n2 | MobileWallet\n3 | Coupon\n4 | Credit\n5 | BankTransfer\n6 | Other",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 25,
+      "Size": "Medium",
+      "Type": "DropdownList"
+    },
+    {
+      "Key": "cb790f2c-f1b2-41d7-9b37-2ba19af4d797",
+      "Name": "Payment Type 2",
+      "OptionsForDropdownList": "0 | Cash\n1 | Card\n2 | MobileWallet\n3 | Coupon\n4 | Credit\n5 | BankTransfer\n6 | Other",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 27,
+      "Size": "Medium",
+      "Type": "DropdownList"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "7eaadfa6-1fb9-4dce-9a1c-9d74beb1d0f7",
+      "Name": "Receipt QRCode",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 30,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "c7e511ba-6e9e-48ad-a61c-084e7d0f38ad",
+      "Name": "Receipt Notes",
+      "Placement": [
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 24,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "568a19c2-bc66-4dc2-8bbd-de0768e7e283",
+      "Name": "Buyer House No",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 117
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "62e8d3ee-bf4d-4b3e-956f-870ed4d99a90",
+      "Name": "Buyer Street",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 116,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "5fc8a9b9-efef-45d0-94da-1b0438e75725",
+      "Name": "Buyer City",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 115,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "aec2c1f7-3aed-49fd-82d8-c15a7b69a74f",
+      "Name": "Buyer Province",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 114,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "2e909259-6785-419a-aaef-6390a427b5f6",
+      "Name": "Buyer Phone No",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 120,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "5b2a8521-9e28-4edf-ac2c-527562349188",
+      "Name": "Buyer Email",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 119,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "2a0e1d10-e66b-4b12-9b9c-3b3f3b7c35f9",
+      "Name": "Buyer Vat Number",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 113
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "af771746-d00a-4f78-906c-8946098e1184",
+      "Name": "Buyer TIN",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 112
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "c8def7d7-8d4d-487c-9685-ab0693dccd1f",
+      "Name": "Buyer Trade Name",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 111,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "d554566a-188b-4c5c-abec-86e1f18eee78",
+      "Name": "Buyer Register Name",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 110,
+      "Size": "Medium"
+    }
+  ],
+  "inventory-item-form": [
+    {
+      "Key": "8335fc1b-176a-4dc6-be5b-a516dcf65bfe",
+      "ItemName": "Item Exempt",
+      "UnitName": "Pce",
+      "ValuationMethod": "WeightedAverageCost",
+      "HasDefaultLineDescription": true,
+      "DefaultLineDescription": "Item with VAT Exempt",
+      "HasDefaultTaxCode": true,
+      "DefaultTaxCode": "6d0a93d1-a251-4509-94d2-9c1b2ade93b3",
+      "CustomFields2": {
+        "Strings": {
+          "329de867-9cf1-4dfe-8b06-5084bce788c7": "00000000"
+        }
+      }
+    },
+    {
+      "Key": "a9c5d199-576c-48e9-b88e-adc8a6728ac2",
+      "ItemName": "Item VAT 15%",
+      "UnitName": "PCE",
+      "ValuationMethod": "WeightedAverageCost",
+      "HasDefaultLineDescription": true,
+      "DefaultLineDescription": "Item with VAT 15% Rate",
+      "HasDefaultTaxCode": true,
+      "DefaultTaxCode": "d45ffe42-182a-4920-a5c6-dd2fd983794a",
+      "CustomFields2": {
+        "Strings": {
+          "329de867-9cf1-4dfe-8b06-5084bce788c7": "00002222"
+        }
+      }
+    },
+    {
+      "Key": "db584304-83c6-4493-9b5b-85856716b7bf",
+      "ItemName": "Item VAT Zero",
+      "UnitName": "PCE",
+      "ValuationMethod": "WeightedAverageCost",
+      "HasDefaultLineDescription": true,
+      "DefaultLineDescription": "Item with VAT Zero Rate",
+      "HasDefaultTaxCode": true,
+      "DefaultTaxCode": "693aa908-e2ae-4a4a-997f-b23cc056d7fd",
+      "CustomFields2": {
+        "Strings": {
+          "329de867-9cf1-4dfe-8b06-5084bce788c7": "00001111"
+        }
+      }
+    }
+  ],
+  "customer-form": [
+    {
+      "Key": "4ca6b624-c371-4269-aa69-91010d9f4b06",
+      "Name": "Company ABC, Ltd.",
+      "CustomFields2": {
+        "Strings": {
+          "c8def7d7-8d4d-487c-9685-ab0693dccd1f": "Food Market ABC",
+          "d554566a-188b-4c5c-abec-86e1f18eee78": "Company ABC, Ltd.",
+          "af771746-d00a-4f78-906c-8946098e1184": "1987012390",
+          "5b2a8521-9e28-4edf-ac2c-527562349188": "john.smith@email.com",
+          "2e909259-6785-419a-aaef-6390a427b5f6": "(081) 20875",
+          "aec2c1f7-3aed-49fd-82d8-c15a7b69a74f": "12 Southgate Hwange",
+          "2a0e1d10-e66b-4b12-9b9c-3b3f3b7c35f9": "198701230",
+          "5fc8a9b9-efef-45d0-94da-1b0438e75725": "Buyer City",
+          "568a19c2-bc66-4dc2-8bbd-de0768e7e283": "1234",
+          "62e8d3ee-bf4d-4b3e-956f-870ed4d99a90": "Buyer Street"
+        }
+      }
+    },
+    {
+      "Key": "26234240-0921-4b40-8369-e3aae4ed0226",
+      "Name": "USD Company ABC, Ltd.",
+      "Currency": "849a16a6-0359-47b7-b506-8e35e239c582",
+      "CustomFields2": {
+        "Strings": {
+          "c8def7d7-8d4d-487c-9685-ab0693dccd1f": "Food Market ABC",
+          "d554566a-188b-4c5c-abec-86e1f18eee78": "Company ABC, Ltd.",
+          "af771746-d00a-4f78-906c-8946098e1184": "19870123",
+          "5b2a8521-9e28-4edf-ac2c-527562349188": "john.smith@email.com",
+          "2e909259-6785-419a-aaef-6390a427b5f6": "(081) 20875",
+          "aec2c1f7-3aed-49fd-82d8-c15a7b69a74f": "12 Southgate Hwange"
+        }
+      }
+    }
+  ],
+  "foreign-currency-form": [
+    {
+      "Key": "849a16a6-0359-47b7-b506-8e35e239c582",
+      "Code": "USD",
+      "Symbol": "USD"
+    }
+  ]
+}
