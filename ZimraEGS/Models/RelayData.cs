@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
-using Zimra.ApiClient;
-using Zimra.ApiClient.Enums;
-using Zimra.ApiClient.Models;
+using ZimraEGS.ApiClient.Enums;
+using ZimraEGS.ApiClient.Helpers;
+using ZimraEGS.ApiClient.Models;
 using ZimraEGS.Helpers;
 
 namespace ZimraEGS.Models
@@ -17,7 +17,8 @@ namespace ZimraEGS.Models
 
         public string ApprovalStatus { get; set; } = string.Empty;
         public int InvReceiptGlobalNo { get; private set; } = 0;
-        public DateTimeOffset? InvReceiptDate { get; private set; } = DateTime.Now;
+
+        public DateTimeOffset? InvReceiptDate { get; private set; }
 
         public string BusinessDetailJson { get; set; } = string.Empty;
         public string InvoiceJson { get; set; } = string.Empty;
@@ -28,8 +29,6 @@ namespace ZimraEGS.Models
 
         public ReceiptType ReceiptType { get; private set; } = ReceiptType.FiscalInvoice;
         public string CurrencyCode { get; private set; } = string.Empty;
-
-
         public string ReceiptNotes { get; private set; } = string.Empty;
         public int DeviceIDRef { get; private set; }
         public string DeviceSNRef { get; private set; } = string.Empty;
@@ -58,7 +57,6 @@ namespace ZimraEGS.Models
         public string BuyerCity { get; private set; } = string.Empty;
         public string BuyerStreet { get; private set; } = string.Empty;
         public string BuyerHouseNo { get; private set; } = string.Empty;
-
         public ManagerInvoice ManagerInvoice { get; private set; }
         public GetStatusResponse DeviceStatus { get; set; }
         public GetConfigResponse DeviceConfig { get; set; }
@@ -89,7 +87,6 @@ namespace ZimraEGS.Models
             InitializeInvoiceData(mergedJson);
 
             DetermineInvoiceType(mergedJson);
-
         }
         private void InitializeBusinessData(string jsonBusiness)
         {
@@ -119,7 +116,13 @@ namespace ZimraEGS.Models
             if (!string.IsNullOrEmpty(ApprovalStatus))
             {
                 InvReceiptGlobalNo = GetIntValue(jsonInvoice, ManagerCustomField.ReceiptGlobalNoGuid);
-                InvReceiptDate = GetDateTimeValue(jsonInvoice, "IssueDate") ?? GetDateTimeValue(jsonInvoice, "Date");
+                //InvReceiptDate = GetDateTimeValue(jsonInvoice, "IssueDate") ?? GetDateTimeValue(jsonInvoice, "Date");
+                InvReceiptDate = GetDateTimeValue(jsonInvoice, ManagerCustomField.ReceiptDateGuid) ??
+                    GetDateTimeValue(jsonInvoice, "IssueDate") ??
+                    GetDateTimeValue(jsonInvoice, "Date");
+
+                var receiptRef = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.ReceiptReferenceGuid);
+                ReceiptReference = JsonConvert.DeserializeObject<InvoiceReference>(receiptRef);
             }
 
             PaymentType1 = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.PaymentType1Guid);
@@ -130,20 +133,22 @@ namespace ZimraEGS.Models
             PaymentAmount2 = GetDoubleValue(jsonInvoice, ManagerCustomField.PaymentAmount2Guid);
 
             BuyerRegisterName = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerRegisterNameGuid);
-            BuyerTradeName = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerTradeNameGuid) ?? "";
-            BuyerTIN = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerTINGuid) ?? "";
-            BuyerVatNumber = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerVatNumberGuid) ?? "";
-            BuyerEmail = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerEmailGuid) ?? "";
-            BuyerPhoneNo = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerPhoneNoGuid) ?? "";
-            BuyerProvince = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerProvinceGuid) ?? "";
-            BuyerCity = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerCityGuid) ?? "";
-            BuyerStreet = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerStreetGuid) ?? "";
-            BuyerHouseNo = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerHouseNoGuid) ?? "";
+            BuyerTradeName = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerTradeNameGuid);
+            BuyerTIN = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerTINGuid);
+            BuyerVatNumber = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerVatNumberGuid);
+            BuyerEmail = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerEmailGuid);
+            BuyerPhoneNo = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerPhoneNoGuid);
+            BuyerProvince = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerProvinceGuid);
+            BuyerCity = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerCityGuid);
+            BuyerStreet = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerStreetGuid);
+            BuyerHouseNo = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerHouseNoGuid);
 
-            ReceiptNotes = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.ReceiptNotesGuid) ?? string.Empty;
+            ReceiptQrCode = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.ReceiptQRCodeGuid);
+            VerificationCode = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.VerificationCodeGuid);
+
             ReceiptPrintForm = "InvoiceA4";
 
-            CurrencyCode = RelayDataHelper.FindStringValueInJson(jsonInvoice, "Code", "Currency");
+            CurrencyCode = RelayDataHelper.FindStringValueInJson(jsonInvoice, "Code", "Currency") ?? "ZWG";
         }
 
 
@@ -153,6 +158,8 @@ namespace ZimraEGS.Models
 
             if (Referrer.Contains("credit-note-view"))
             {
+                ReceiptNotes = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.ReceiptNotesGuid) ?? string.Empty;
+
                 DeviceIDRef = GetIntValue(jsonInvoice, ManagerCustomField.DeviceIDGuid, "RefInvoice");
                 DeviceSNRef = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.DeviceSNGuid, "RefInvoice");
                 FiscalDayNoRef = GetIntValue(jsonInvoice, ManagerCustomField.FiscalDayNoGuid, "RefInvoice");
@@ -171,7 +178,6 @@ namespace ZimraEGS.Models
                 }
             }
         }
-
 
         private string GetValue(Dictionary<string, string> formData, string key)
         {
@@ -211,7 +217,7 @@ namespace ZimraEGS.Models
                 DeviceStatusJson = JsonConvert.SerializeObject(DeviceStatus, Formatting.Indented),
                 Api = Api,
                 Token = Token,
-                Referrer = Referrer // If necessary
+                Referrer = Referrer
             };
 
             return viewModel;
@@ -219,24 +225,30 @@ namespace ZimraEGS.Models
 
         public CloseDayViewModel GetCloseDayViewModel()
         {
-            BusinessReference businessReference = BusinessReference ?? new BusinessReference();
-
             var viewModel = new CloseDayViewModel
             {
-                CertificateInfo = CertificateInfo,
                 BusinessDetailJson = BusinessDetailJson,
                 Api = Api,
                 Token = Token,
                 Referrer = Referrer,
-                VerificationCode = VerificationCode,
-                ReceiptQrCode = ReceiptQrCode,
-                ReceiptReference = ReceiptReference,
-                BusinessReference = businessReference,
-                DeviceStatus = DeviceStatus,
             };
 
             return viewModel;
         }
+
+        public ApprovedInvoiceViewModel GetApprovedInvoiceViewModel()
+        {
+            var viewModel = new ApprovedInvoiceViewModel
+            {
+                ReceiptReferenceJson = JsonConvert.SerializeObject(ReceiptReference, Formatting.Indented),
+                Referrer = Referrer,
+                ReceiptVerificationCode = VerificationCode,
+                ReceiptQrCode = ReceiptQrCode,
+            };
+
+            return viewModel;
+        }
+
         public RelayDataViewModel GetRelayDataViewModel()
         {
             RelayDataViewModel viewModel = new RelayDataViewModel();
@@ -263,11 +275,12 @@ namespace ZimraEGS.Models
 
             viewModel.FiscalDayStatus = DeviceStatus.FiscalDayStatus;
             viewModel.FiscalDayNo = DeviceStatus.LastFiscalDayNo ?? 1;
-            viewModel.ReceiptGlobalNo = DeviceStatus.LastReceiptGlobalNo + 1;
+
+            viewModel.ReceiptGlobalNo = Receipt.ReceiptGlobalNo;
             viewModel.ReceiptCounter = Receipt.ReceiptCounter;
 
             viewModel.InvoiceNumber = Receipt.InvoiceNo;
-            viewModel.InvoiceDate = Receipt.ReceiptDate.ToString("yyyy-MM-dd HH:mm:ss");
+            viewModel.InvoiceDate = Receipt.ReceiptDate;
 
             viewModel.BuyerRegisterName = Receipt.BuyerData.BuyerRegisterName;
 
@@ -289,7 +302,7 @@ namespace ZimraEGS.Models
             viewModel.ReceiptHash = Convert.ToBase64String(Receipt.ReceiptDeviceSignature.Hash);
             viewModel.ReceiptSignature = Convert.ToBase64String(Receipt.ReceiptDeviceSignature.Signature);
 
-            string md5Signature = DigitalSignatureUtility.ComputeMD5(Receipt.ReceiptDeviceSignature.Signature);
+            string md5Signature = Utilities.ComputeMD5(Receipt.ReceiptDeviceSignature.Signature);
 
             viewModel.ReceiptQrCode = CertificateInfo.QrUrl + '/' +
                 CertificateInfo.DeviceID.ToString().PadLeft(10, '0') +
@@ -303,12 +316,15 @@ namespace ZimraEGS.Models
                 md5Signature.Substring(8, 4),
                 md5Signature.Substring(12, 4));
 
-
             viewModel.ReceiptJson = JsonConvert.SerializeObject(Receipt);
 
             viewModel.BusinessReferenceJson = JsonConvert.SerializeObject(BusinessReference);
             viewModel.FiscalDaySummaryJson = JsonConvert.SerializeObject(FiscalDaySummary);
             viewModel.InvoiceReferenceJson = JsonConvert.SerializeObject(ReceiptReference);
+
+            DateTimeOffset fiscalDayEnd = BusinessReference.FiscalDayOpened.AddHours(CertificateInfo.TaxPayerDayMaxHrs);
+            TimeSpan timeDifference = DateTimeOffset.Now - fiscalDayEnd;
+            viewModel.TimeForCloseDay = timeDifference.TotalHours < CertificateInfo.TaxpayerDayEndNotificationHrs;
 
             return viewModel;
 

@@ -8,7 +8,6 @@
         public const string CertificateInfoGuid = "6a347c55-735a-4a38-8cf6-0db93dce2ded"; //31
 
         // Customers & Invoice
-        public const string ApprovalStatusGuid = "fc6f05f9-50c7-46c0-b9f5-7fe0ca83cf2a"; //25
 
         public const string BuyerRegisterNameGuid = "d554566a-188b-4c5c-abec-86e1f18eee78";
         public const string BuyerTradeNameGuid = "c8def7d7-8d4d-487c-9685-ab0693dccd1f";
@@ -22,15 +21,19 @@
         public const string BuyerHouseNoGuid = "568a19c2-bc66-4dc2-8bbd-de0768e7e283";
 
         // Invoice
-        public const string ReceiptReferenceGuid = "75190339-992a-4fb0-bf79-f5f8226edb4b"; //1
+
 
         public const string PaymentType1Guid = "5b3ebf5f-ad4f-4ffc-84d1-abda67a7d294"; //25
         public const string PaymentAmount1Guid = "e2ab11ef-73e2-4ea4-802f-55b8c834037d"; //26
         public const string PaymentType2Guid = "cb790f2c-f1b2-41d7-9b37-2ba19af4d797"; //27
         public const string PaymentAmount2Guid = "f3a2f5dd-8da8-4701-b8d5-be5877792a79"; //28
 
+
         public const string ReceiptQRCodeGuid = "7eaadfa6-1fb9-4dce-9a1c-9d74beb1d0f7"; //30
         public const string VerificationCodeGuid = "a0454495-cae8-43ef-a418-4dad69427e78"; //38
+        public const string ApprovalStatusGuid = "fc6f05f9-50c7-46c0-b9f5-7fe0ca83cf2a"; //25
+        public const string ReceiptDateGuid = "39b3d219-a386-4d9f-b3a0-55968b4bc7b7";
+        public const string ReceiptReferenceGuid = "75190339-992a-4fb0-bf79-f5f8226edb4b"; //1
 
         public const string DeviceIDGuid = "d08c8744-486f-470d-82d1-29b1a1cb06ae"; //40
         public const string DeviceSNGuid = "a360538c-ebe9-49e9-8cf8-fccd51320380"; //41
@@ -39,7 +42,7 @@
         public const string ReceiptGlobalNoGuid = "4712e5df-c5e3-4b6e-9746-8ebb58a81dee"; //44
 
         public const string ReceiptNotesGuid = "c7e511ba-6e9e-48ad-a61c-084e7d0f38ad"; //20
-        public const string DeviceIDRefGuid = ""; 
+        public const string DeviceIDRefGuid = "";
         public const string DeviceSNRefGuid = "";
         public const string FiscalDayNoRefGuid = "770e9cdb-9f55-497a-923a-f8cef6b93595"; //46
         public const string ReceiptCounterRefGuid = "de2ba4f5-baa3-45b7-86d4-716fb923557e"; //47

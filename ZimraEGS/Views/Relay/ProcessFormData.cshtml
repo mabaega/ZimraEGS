@@ -10,13 +10,13 @@
 }
 
 @functions {
-    public string GetFiscalDayStatusColor(Zimra.ApiClient.Enums.FiscalDayStatus status)
+    public string GetFiscalDayStatusColor(ZimraEGS.ApiClient.Enums.FiscalDayStatus status)
     {
         return status switch
         {
-            Zimra.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed => "bg-danger text-white", // Red with white text
-            Zimra.ApiClient.Enums.FiscalDayStatus.FiscalDayOpened => "bg-success text-white", // Green with white text
-            _ => "bg-warning text-dark" // Yellow with dark text
+            ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed => "--bs-danger", // Red with white text
+            ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayOpened => "--bs-success", // Green with white text
+            _ => "--bs-warning" // Yellow with dark text
         };
     }
 }
@@ -158,16 +158,18 @@
                                 </div>
 
                                 <div class="row">
+                                    
                                     <div class="col-md-3">
                                         <div class="mb-2">
                                             <label for="InvoiceNumber" class="form-label">Invoice No:</label>
                                             <input type="text" class="form-control form-control-sm text-center" id="InvoiceNumber" name="InvoiceNumber" value="@Model.InvoiceNumber" readonly>
                                         </div>
                                     </div>
+
                                     <div class="col-md-3">
                                         <div class="mb-2">
                                             <label for="InvoiceDate" class="form-label">Receipt Date:</label>
-                                            <input type="text" class="form-control form-control-sm text-center" id="InvoiceDate" name="InvoiceDate" value="@Model.InvoiceDate" readonly>
+                                            <input type="text" class="form-control form-control-sm text-center" id="InvoiceDate" name="InvoiceDate" value="@Model.InvoiceDate.ToString("yyyy-MM-dd HH:mm:ss")" readonly>
                                         </div>
                                     </div>
 
@@ -279,7 +281,7 @@
                                                     {
                                                         try
                                                         {
-                                                            var formattedJson = DocumentFormatter.SerializeObject(JsonConvert.DeserializeObject(Model.InvoiceJson));
+                                                            var formattedJson = Utils.SerializeObject(JsonConvert.DeserializeObject(Model.InvoiceJson));
                                                             @Html.Raw(formattedJson)
                                                             ;
                                                         }
@@ -306,7 +308,7 @@
                                                     {
                                                         try
                                                         {
-                                                            var formattedJson = DocumentFormatter.SerializeObject(JsonConvert.DeserializeObject(Model.ReceiptJson));
+                                                            var formattedJson = Utils.SerializeObject(JsonConvert.DeserializeObject(Model.ReceiptJson));
                                                             @Html.Raw(formattedJson)
                                                             ;
                                                         }
@@ -328,7 +330,6 @@
                                     <div class="tab-pane fade show active" id="nav-response" role="tabpanel" aria-labelledby="nav-response-tab">
                                         <div class="mb-2">
                                             <textarea class="form-control form-control-sm" id="textareaResponse" name="PortalResult" rows="10" readonly wrap="off" style="margin-top: 10px; min-height: 200px;">
-                                                
                                         </textarea>
                                         </div>
                                     </div>
@@ -344,7 +345,7 @@
 
                                     <div id="buttonsContainer">
 
-                                        @if (string.IsNullOrEmpty(Model.ReceiptVerificationCode) & (Model.FiscalDayStatus != Zimra.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed))
+                                        @if (Model.FiscalDayStatus == ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayOpened)
                                         {
                                             <button id="submitReceiptButton" class="btn btn-info mt-1">
                                                 <i class="fas fa-spinner fa-spin hidden"></i>
@@ -379,23 +380,27 @@
                                         <span><strong>Device Serial Number:</strong></span>
                                         <span>@Model.DeviceSN</span>
                                     </div>
-                                    <div class="d-flex justify-content-between">
+                                </div>
+                                <hr />
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-center">
                                         <span><strong>Fiscal Day Status:</strong></span>
-                                        <span class="badge @GetFiscalDayStatusColor(Model.FiscalDayStatus)">
+                                    </div>
+                                    <div class="d-flex justify-content-center">
+                                        <div style="margin-top: 10px; padding: 4px 30px; border-radius: 5px; background-color: var(@GetFiscalDayStatusColor(Model.FiscalDayStatus));">
                                             @Model.FiscalDayStatus
-                                        </span>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <!-- Fiscal Day Buttons -->
-                                <div id="fisacalButtonContainar" class="text-center mb-4">
-                                    <button id="openDayButton" class="btn btn-info @((Model.FiscalDayStatus == Zimra.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed) ? "" : "d-none" )">
-                                        <i class="fas fa-spinner fa-spin hidden"></i> Open Fiscal Day
-                                    </button>
-                                    <button id="closeDayButton" class="btn btn-info @((Model.FiscalDayStatus != Zimra.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed) ? "" : "d-none")">
-                                        <i class="fas fa-spinner fa-spin hidden"></i> Close Fiscal Day
-                                    </button>
-                                </div>
+                                <!-- Close Fiscal Day Buttons -->
+                                @if((Model.FiscalDayStatus == ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayOpened && Model.TimeForCloseDay ) || 
+                                Model.FiscalDayStatus == ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayCloseFailed){
+                                    <div id="fisacalButtonContainar" class="text-center mb-4">
+                                        <button id="closeDayButton" class="btn btn-warning">
+                                            <i class="fas fa-spinner fa-spin hidden"></i> Close Fiscal Day
+                                        </button>
+                                    </div>
+                                }
 
                                 <hr />
 

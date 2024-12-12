@@ -1,17 +1,17 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using Zimra.ApiClient.Models;
+using ZimraEGS.ApiClient.Models;
 
-namespace ZimraEGS.Helpers
+namespace ZimraEGS.ApiClient.Helpers
 {
     public class ApiHelper
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
 
-        public ApiHelper(EnvironmentType environmentType)
+        public ApiHelper(PlatformType environmentType)
         {
             // Set the base URL for API requests
             var baseUrl = Utilities.GetBaseUrl(environmentType);
@@ -19,7 +19,7 @@ namespace ZimraEGS.Helpers
             _httpClient = new HttpClient();
         }
 
-        public ApiHelper(string pfxBase64, EnvironmentType environmentType)
+        public ApiHelper(string pfxBase64, PlatformType environmentType)
         {
             // Explicitly set security protocols with more flexibility
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
@@ -82,9 +82,7 @@ namespace ZimraEGS.Helpers
             return certificate;
         }
 
-
-
-                // Example method to send GET request to the API
+        // Example method to send GET request to the API
         public async Task<ServerResponse> SendGetRequestAsync(string lastPath, int? deviceID, string deviceModelName, string deviceModelVersion)
         {
             if (string.IsNullOrWhiteSpace(lastPath) || !deviceID.HasValue)
@@ -198,6 +196,7 @@ namespace ZimraEGS.Helpers
                 throw new Exception($"An error occurred while calling the API: {ex.Message}", ex);
             }
         }
+
         public async Task<ServerResponse> GetServerCertificateAsync(string? thumbprint)
         {
             // Prepare the endpoint with query parameter
@@ -231,6 +230,7 @@ namespace ZimraEGS.Helpers
                 throw new Exception($"An error occurred while calling the API: {ex.Message}", ex);
             }
         }
+
         public async Task<ServerResponse> IssueCertificateAsync(int? deviceID, string deviceModelName, string deviceModelVersion, IssueCertificateRequest body)
         {
             // Prepare the endpoint
@@ -269,6 +269,7 @@ namespace ZimraEGS.Helpers
                 throw new Exception($"An error occurred while calling the API: {ex.Message}", ex);
             }
         }
+
         public async Task<ServerResponse> GetConfigAsync(int? deviceID, string deviceModelName, string deviceModelVersion)
         {
             // Prepare the endpoint
@@ -301,6 +302,7 @@ namespace ZimraEGS.Helpers
                 throw new Exception($"An error occurred while calling the API: {ex.Message}", ex);
             }
         }
+
         public async Task<ServerResponse> GetStatusAsync(int? deviceID, string deviceModelName, string deviceModelVersion)
         {
             // Prepare the endpoint
@@ -333,6 +335,7 @@ namespace ZimraEGS.Helpers
                 throw new Exception($"An error occurred while calling the API: {ex.Message}", ex);
             }
         }
+
         public async Task<ServerResponse> PingAsync(int? deviceID, string deviceModelName, string deviceModelVersion)
         {
             // Prepare the endpoint
@@ -365,6 +368,7 @@ namespace ZimraEGS.Helpers
                 throw new Exception($"An error occurred while calling the API: {ex.Message}", ex);
             }
         }
+
         public async Task<ServerResponse> OpenDayAsync(int? deviceID, string deviceModelName, string deviceModelVersion, OpenDayRequest body)
         {
             // Prepare the endpoint
@@ -403,6 +407,7 @@ namespace ZimraEGS.Helpers
                 throw new Exception($"An error occurred while calling the API: {ex.Message}", ex);
             }
         }
+
         public async Task<ServerResponse> SubmitReceiptAsync(int? deviceID, string deviceModelName, string deviceModelVersion, Receipt body)
         {
             // Prepare the endpoint
@@ -441,6 +446,7 @@ namespace ZimraEGS.Helpers
                 throw new Exception($"An error occurred while calling the API: {ex.Message}", ex);
             }
         }
+
         public async Task<ServerResponse> CloseDayAsync(int? deviceID, string deviceModelName, string deviceModelVersion, OpenDayRequest body)
         {
             // Prepare the endpoint
@@ -479,7 +485,6 @@ namespace ZimraEGS.Helpers
                 throw new Exception($"An error occurred while calling the API: {ex.Message}", ex);
             }
         }
-
 
         public async Task<ServerResponse> SendPostRequestAsync<TBody>(string lastPath, int? deviceID, string deviceModelName, string deviceModelVersion, TBody? body)
         {

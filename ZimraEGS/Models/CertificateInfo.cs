@@ -1,13 +1,12 @@
 ﻿using Newtonsoft.Json;
-using Zimra.ApiClient.Helpers;
-using Zimra.ApiClient.Models;
-using ZimraEGS.Helpers;
+using ZimraEGS.ApiClient.Helpers;
+using ZimraEGS.ApiClient.Models;
 
 namespace ZimraEGS.Models
 {
     public class CertificateInfo
     {
-        public EnvironmentType IntegrationType { get; set; } = EnvironmentType.Simulation;
+        public PlatformType IntegrationType { get; set; } = PlatformType.Simulation;
         public int DeviceID { get; set; } = 20203;
         public string DeviceSerialNumber { get; set; } = "MGR2401";
         public string ActivationKey { get; set; } = "00375086";
@@ -30,7 +29,7 @@ namespace ZimraEGS.Models
         public string GeneratedCSR { get; set; } = string.Empty;
         public string PrivateKey { get; set; } = string.Empty;
         public string DeviceCertificate { get; set; }
-        public string Base64Pfx { get; set; } = string.Empty;   
+        public string Base64Pfx { get; set; } = string.Empty;
 
         public int DeviceOperatingMode { get; set; }
         public string ApplicableTaxes { get; set; }
@@ -42,7 +41,7 @@ namespace ZimraEGS.Models
         [Newtonsoft.Json.JsonConverter(typeof(LocalDateTimeConverter))]
         public DateTimeOffset CertificateValidTill { get; set; }
 
-        public string ApiBaseUrl => Helpers.Utilities.GetBaseUrl(IntegrationType);
+        public string ApiBaseUrl => Utilities.GetBaseUrl(IntegrationType);
         public CertificateInfo()
         {
             DeviceID = 20203;

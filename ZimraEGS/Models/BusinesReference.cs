@@ -1,15 +1,15 @@
-﻿using Zimra.ApiClient.Enums;
-using Zimra.ApiClient.Models;
+﻿using ZimraEGS.ApiClient.Enums;
+using ZimraEGS.ApiClient.Models;
 
 namespace ZimraEGS.Models
 {
     public class BusinessReference
     {
-        public EnvironmentType IntegrationType { get; set; } = EnvironmentType.Simulation;
+        public PlatformType IntegrationType { get; set; } = PlatformType.Simulation;
         public int DeviceID { get; set; } = 0;
         public string DeviceSerialNumber { get; set; } = string.Empty;
         public FiscalDayStatus FiscalDayStatus { get; set; } = FiscalDayStatus.FiscalDayClosed;
-        public string FiscalDayOpened { get; set; } = string.Empty;
+        public DateTimeOffset FiscalDayOpened { get; set; }
         public int LastReceiptGlobalNo { get; set; } = 0;
         public int LastFiscalDayNo { get; set; } = 0;
         public int LastReceiptCounter { get; set; } = 0;

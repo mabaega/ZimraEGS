@@ -2,10 +2,9 @@
 using Newtonsoft.Json;
 using System.IO.Compression;
 using System.Net;
-using System.Resources;
 using System.Text;
-using Zimra.ApiClient;
-using Zimra.ApiClient.Models;
+using ZimraEGS.ApiClient.Helpers;
+using ZimraEGS.ApiClient.Models;
 using ZimraEGS.Helpers;
 using ZimraEGS.Models;
 
@@ -51,7 +50,7 @@ namespace ZimraEGS.Controllers
             try
             {
                 // Nama file: cfData.json
-                string jsonData = Utilities.ReadEmbeddedResource("cfData.json");
+                string jsonData = Utils.ReadEmbeddedResource("cfData.json");
                 return Content(jsonData, "application/json");
             }
             catch (Exception ex)
@@ -76,7 +75,7 @@ namespace ZimraEGS.Controllers
                     DeviceSerialNo = verifyTaxPayerDto.DeviceSerialNumber
                 };
 
-                EnvironmentType integrationType = (EnvironmentType)Enum.Parse(typeof(EnvironmentType), verifyTaxPayerDto.IntegrationType);
+                PlatformType integrationType = (PlatformType)Enum.Parse(typeof(PlatformType), verifyTaxPayerDto.IntegrationType);
                 ApiHelper apiHelper = new ApiHelper(integrationType);
                 ServerResponse serverResponse = await apiHelper.VerifyTaxpayerInformationAsync(
                     verifyTaxPayerDto.DeviceID,
@@ -124,7 +123,7 @@ namespace ZimraEGS.Controllers
             {
                 string errMessage = string.Empty;
 
-                var (generatedCsr, privateKey) = new ECCSRGenerator().GenerateCsrAndPrivateKey(deviceRegistration.CommonName);
+                var (generatedCsr, privateKey) = RSA_CryptoHelper.GenerateCSR(deviceRegistration.CommonName);
 
                 // Register Device
                 RegisterDeviceRequest registerDeviceRequest = new RegisterDeviceRequest
@@ -133,17 +132,16 @@ namespace ZimraEGS.Controllers
                     CertificateRequest = generatedCsr
                 };
 
-                EnvironmentType integrationType = (EnvironmentType)Enum.Parse(typeof(EnvironmentType), deviceRegistration.IntegrationType);
+                PlatformType integrationType = (PlatformType)Enum.Parse(typeof(PlatformType), deviceRegistration.IntegrationType);
 
-                ApiHelper apiHelper = new ApiHelper(EnvironmentType.Simulation);
+                ApiHelper apiHelper = new ApiHelper(PlatformType.Simulation);
                 ServerResponse serverResponse = await apiHelper.RegisterDeviceAsync(deviceRegistration.DeviceID, deviceRegistration.DeviceModelName, deviceRegistration.DeviceModelVersion, registerDeviceRequest);
 
                 if (serverResponse.StatusCode == HttpStatusCode.OK)
                 {
                     var deviceCertificate = serverResponse.GetContentAs<RegisterDeviceResponse>().Certificate;
 
-                    //(string pfxpath, string pfxbyte) = Utility.GeneratePfx(Utility.CleanBase64String(privateKey), Utility.CleanBase64String(deviceCertificate), (string)null);
-                    string pfxbyte = CertificateHelper.GeneratePfxBase64(Utilities.CleanBase64String(privateKey), Utilities.CleanBase64String(deviceCertificate), (string)null);
+                    string pfxbyte = Utilities.GeneratePfx(Utilities.CleanBase64String(privateKey), Utilities.CleanBase64String(deviceCertificate), (string)null);
 
                     var response = new
                     {
@@ -188,10 +186,10 @@ namespace ZimraEGS.Controllers
             {
                 string errMessage = string.Empty;
 
-                EnvironmentType integrationType = (EnvironmentType)Enum.Parse(typeof(EnvironmentType), getConfigDTO.IntegrationType);
+                PlatformType integrationType = (PlatformType)Enum.Parse(typeof(PlatformType), getConfigDTO.IntegrationType);
 
                 // Create ApiHelper with the Base64 PFX string
-                ApiHelper apiHelper = new ApiHelper(getConfigDTO.Base64Pfx, EnvironmentType.Simulation);
+                ApiHelper apiHelper = new ApiHelper(getConfigDTO.Base64Pfx, PlatformType.Simulation);
 
                 ServerResponse serverResponse = await apiHelper.GetConfigAsync(getConfigDTO.DeviceID, getConfigDTO.DeviceModelName, getConfigDTO.DeviceModelVersion);
 

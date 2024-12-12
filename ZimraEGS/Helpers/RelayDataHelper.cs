@@ -5,7 +5,6 @@ namespace ZimraEGS.Helpers
 {
     public class RelayDataHelper
     {
-
         public static string ModifyStringCustomFields2(string editData, string fieldGuid, string? newValue, string? key = null)
         {
             JObject jsonObject = JObject.Parse(editData);
@@ -127,47 +126,6 @@ namespace ZimraEGS.Helpers
         }
 
 
-        public static string ModifyFieldInCustomFields2(string jsonString, string key, string sectionName, string fieldGuid, string newValue)
-        {
-            JObject jsonObject = JObject.Parse(jsonString);
-            JObject targetSection;
-
-            // Determine the target section based on the key
-            if (string.IsNullOrEmpty(key))
-            {
-                targetSection = jsonObject; // Work with the root object if no key
-            }
-            else
-            {
-                targetSection = FindSectionContainingKey(jsonObject, key);
-            }
-
-            if (targetSection == null)
-            {
-                throw new InvalidOperationException("The section with the specified key was not found.");
-            }
-
-            // Get or initialize the "CustomFields2" section
-            JObject customFields2 = targetSection["CustomFields2"] as JObject;
-            if (customFields2 == null)
-            {
-                customFields2 = new JObject();
-                targetSection["CustomFields2"] = customFields2;
-            }
-
-            // Handle the desired section ("Strings" or "Decimals")
-            JObject specificSection = customFields2[sectionName] as JObject;
-            if (specificSection == null)
-            {
-                specificSection = new JObject();
-                customFields2[sectionName] = specificSection;
-            }
-
-            // Update or create the field
-            specificSection[fieldGuid] = newValue;
-
-            return jsonObject.ToString();
-        }
 
         private static JObject FindSectionContainingKey(JObject jsonObject, string key)
         {
@@ -253,8 +211,6 @@ namespace ZimraEGS.Helpers
             // Serialize the updated JSON back to a string
             return JsonConvert.SerializeObject(jsonObject, Formatting.Indented);
         }
-
-
 
         public static string GetJsonDataByGuid(string jsonString, string dataKey)
         {
@@ -425,7 +381,7 @@ namespace ZimraEGS.Helpers
                     // Now search for the fieldValue within the found jsonKey
                     return FindValueInFullData((JObject)startToken, fieldValue)?.ToString();
                 }
-                return string.Empty; // If jsonKey is not found or is not an object
+                return null; // If jsonKey is not found or is not an object
             }
             else
             {
@@ -525,32 +481,6 @@ namespace ZimraEGS.Helpers
             return null; // Return null if the fieldValue is not found in the array
         }
 
-        //REPLACE VALUE
-        // Main method to replace a specific field value by its key
-        public static string ReplaceStringValueInJson(string jsonData, string fieldValue, string newValue, string? jsonKey = null)
-        {
-            // Parse the JSON string into a JObject
-            var fullData = JObject.Parse(jsonData);
-
-            // If jsonKey is provided, find the corresponding token
-            if (!string.IsNullOrEmpty(jsonKey))
-            {
-                var startToken = FindJsonKey(fullData, jsonKey);
-                if (startToken != null && startToken.Type == JTokenType.Object)
-                {
-                    // Now replace the fieldValue within the found jsonKey
-                    ReplaceValueInFullData((JObject)startToken, fieldValue, newValue);
-                }
-            }
-            else
-            {
-                // If no jsonKey is provided, replace the fieldValue from the root
-                ReplaceValueInFullData(fullData, fieldValue, newValue);
-            }
-
-            // Return the modified JSON as a string
-            return fullData.ToString();
-        }
 
         // Recursive method to replace the value of a specified fieldValue within an object
         private static void ReplaceValueInFullData(JObject fullData, string fieldValue, string newValue)

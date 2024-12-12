@@ -1,4 +1,4 @@
-﻿using Zimra.ApiClient.Enums;
+﻿using ZimraEGS.ApiClient.Enums;
 
 namespace ZimraEGS.Models
 {

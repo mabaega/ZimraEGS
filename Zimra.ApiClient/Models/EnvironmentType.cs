@@ -1,6 +1,6 @@
 ﻿namespace Zimra.ApiClient.Models
 {
-    public enum EnvironmentType
+    public enum PlatformType
     {
 
         [System.Runtime.Serialization.EnumMember(Value = @"Simulation")]

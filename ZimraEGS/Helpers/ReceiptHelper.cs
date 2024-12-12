@@ -1,8 +1,10 @@
-﻿using Zimra.ApiClient.Models;
-using Zimra.ApiClient.Enums;
-using ZimraEGS.Models;
+﻿using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using Zimra.ApiClient;
+using ZimraEGS.ApiClient.Enums;
+using ZimraEGS.ApiClient.Helpers;
+using ZimraEGS.ApiClient.Models;
+using ZimraEGS.Models;
 
 namespace ZimraEGS.Helpers
 {
@@ -19,13 +21,13 @@ namespace ZimraEGS.Helpers
 
             receipt.ReceiptType = relayData.ReceiptType;
 
-            receipt.ReceiptCurrency = relayData.CurrencyCode ?? "ZWG";
+            receipt.ReceiptCurrency = string.IsNullOrEmpty(relayData.CurrencyCode) ? "ZWG" : relayData.CurrencyCode;
             receipt.ReceiptCounter = relayData.BusinessReference.LastReceiptCounter + 1;
 
             //Handle Rejected Invoice
-            if(relayData.InvReceiptGlobalNo == 0) //New Invoice
+            if (relayData.InvReceiptGlobalNo == 0) //New Invoice
             {
-                receipt.ReceiptGlobalNo = relayData.DeviceStatus.LastReceiptGlobalNo + 1; 
+                receipt.ReceiptGlobalNo = relayData.DeviceStatus.LastReceiptGlobalNo + 1;
                 receipt.ReceiptDate = DateTimeOffset.Now;
             }
             else
@@ -72,7 +74,17 @@ namespace ZimraEGS.Helpers
 
             receipt.ReceiptLines = GetReceiptLine();
 
-            receipt.ReceiptTaxes = GetReceiptTaxs([.. receipt.ReceiptLines]);
+            List<ReceiptTax> listofreceipttax = GetNormalReceiptTaxs([.. receipt.ReceiptLines], receipt.ReceiptLinesTaxInclusive);
+
+            receipt.ReceiptTaxes = listofreceipttax.GroupBy(x => new { x.TaxCode, x.TaxID, x.TaxPercent })
+                                  .Select(g => new ReceiptTax
+                                  {
+                                      TaxCode = g.Key.TaxCode,
+                                      TaxID = g.Key.TaxID,
+                                      TaxPercent = g.Key.TaxPercent,
+                                      TaxAmount = g.Sum(x => x.TaxAmount),
+                                      SalesAmountWithTax = g.Sum(x => x.SalesAmountWithTax)
+                                  }).OrderBy(o => o.TaxID).ToList();
 
             receipt.ReceiptPayments = GetPayments();
 
@@ -80,24 +92,33 @@ namespace ZimraEGS.Helpers
 
             receipt.ReceiptPrintForm = relayData.ReceiptPrintForm == "Receipt48" ? ReceiptPrintForm.Receipt48 : ReceiptPrintForm.InvoiceA4;
 
-            string ReceiptTaxsHash = GetReceiptTaxsHash([.. receipt.ReceiptTaxes], receipt.ReceiptCurrency);
+            //string ReceiptTaxsHash = GetReceiptTaxsHash([.. receipt.ReceiptTaxes], receipt.ReceiptCurrency);
+            string ReceiptTaxsHash = GetReceiptTaxsHash([.. listofreceipttax], receipt.ReceiptCurrency);
 
             string SourcesHash =
                 ((relayData.CertificateInfo.DeviceID.ToString() +
-                receipt.ReceiptType +
+                receipt.ReceiptType.ToString().ToUpper() +
                 receipt.ReceiptCurrency +
                 receipt.ReceiptGlobalNo.ToString() +
                 receipt.ReceiptDate.ToString("yyyy-MM-ddTHH:mm:ss") +
-                (receipt.ReceiptTotal * 100).ToString() +
-                ReceiptTaxsHash).ToUpper() +
-                relayData.BusinessReference.LastReceiptHash);
+                (receipt.ReceiptTotal * 100).ToString("F0") +
+                ReceiptTaxsHash));
+
+            if (receipt.ReceiptCounter > 1)
+            {
+                SourcesHash += relayData.BusinessReference.LastReceiptHash;
+            }
+
+            Console.WriteLine("Sources Hash String: " + SourcesHash);
 
             // Generate hash
-            byte[] hashByte = Utilities.GenerateHash(SourcesHash);
+            byte[] hashByte = RSA_CryptoHelper.ComputeSHA256Hash(SourcesHash);
             Console.WriteLine("Hash (Base64): " + Convert.ToBase64String(hashByte));
 
             // Generate signature
-            byte[] signatureByte = CertificateHelper.GenerateSignature(Convert.ToBase64String(hashByte), relayData.CertificateInfo.PrivateKey);
+            //ECDsa privateKey = relayData.CertificateInfo.GetPrivateKey(); 
+            RSA privateKey = RSA_CryptoHelper.ConvertPrivateKeyFromBase64(relayData.CertificateInfo.PrivateKey);
+            byte[] signatureByte = RSA_CryptoHelper.SignDocument(privateKey, hashByte);
             Console.WriteLine("Signature (Base64): " + Convert.ToBase64String(signatureByte));
 
             // Set signature data
@@ -108,10 +129,8 @@ namespace ZimraEGS.Helpers
             };
 
             // Verify signature
-            bool isValid = CertificateHelper.VerifySignature(
-                receipt.ReceiptDeviceSignature.Hash,
-                receipt.ReceiptDeviceSignature.Signature,
-                relayData.CertificateInfo.DeviceCertificate);
+            X509Certificate2 deviceCertificate = RSA_CryptoHelper.ConvertCertificateFromBase64(relayData.CertificateInfo.DeviceCertificate);
+            bool isValid = RSA_CryptoHelper.VerifySignature(deviceCertificate, hashByte, signatureByte);
 
             if (isValid)
             {
@@ -124,7 +143,6 @@ namespace ZimraEGS.Helpers
                 Console.WriteLine("Signature (Base64): " + Convert.ToBase64String(receipt.ReceiptDeviceSignature.Signature));
                 Console.WriteLine("Certificate: " + relayData.CertificateInfo.DeviceCertificate);
             }
-
 
             return receipt;
         }
@@ -150,12 +168,13 @@ namespace ZimraEGS.Helpers
                 double taxRate = l.TaxCode?.Rate ?? 0;
                 double unitPrice = l.UnitPrice;
 
-                rl.ReceiptLineType = Zimra.ApiClient.Enums.ReceiptLineType.Sale;
+                rl.ReceiptLineType = ZimraEGS.ApiClient.Enums.ReceiptLineType.Sale;
                 rl.ReceiptLineNo = rw;
                 rl.ReceiptLineName = GetFirstNonNullOrEmpty(l.LineDescription, l.Item.Name, l.Item.ItemName);
-                rl.ReceiptLineHSCode = HsCode.PadLeft(8,'0');
+                rl.ReceiptLineHSCode = HsCode.PadLeft(8, '0');
                 rl.ReceiptLineQuantity = Math.Round(l.Qty, 2);
-                rl.ReceiptLinePrice = Math.Round(isIncludeTax ? unitPrice / (1 + (taxRate / 100)) : unitPrice, 4);
+                //rl.ReceiptLinePrice = Math.Round(isIncludeTax ? unitPrice / (1 + (taxRate / 100)) : unitPrice, 4);
+                rl.ReceiptLinePrice = Math.Round(unitPrice, 4);
 
                 if (relayData.ReceiptType == ReceiptType.DebitNote)
                 {
@@ -164,16 +183,16 @@ namespace ZimraEGS.Helpers
 
                 rl.ReceiptLineTotal = Math.Round(l.Qty * (double)rl.ReceiptLinePrice, 2);
 
-                if (l.TaxCode != null && l.TaxCode.Name.Contains('|'))
+                if (l.TaxCode != null && l.TaxCode.Name.Contains('—'))
                 {
-                    var taxcode = l.TaxCode.Name.Split("|");
-                    rl.TaxCode = taxcode[2].Trim();
+                    var taxcode = l.TaxCode.Name.Split("—");
+                    //rl.TaxCode = taxcode[2].Trim();
                     rl.TaxID = GetIntValue(taxcode[1].Trim());
-                    rl.TaxPercent = rl.TaxID == 1 ? null: taxRate;
+                    rl.TaxPercent = rl.TaxID == 1 ? null : taxRate;
                 }
                 else
                 {
-                    rl.TaxCode = "A";
+                    //rl.TaxCode = "A";
                     rl.TaxID = 1;
                     rl.TaxPercent = null;
                 }
@@ -198,12 +217,13 @@ namespace ZimraEGS.Helpers
                     double Qty = (l.Qty == 0) ? 1 : l.Qty;
                     double unitPrice = Math.Round(l.DiscountAmount / l.Qty, 4);
 
-                    rl.ReceiptLineType = Zimra.ApiClient.Enums.ReceiptLineType.Discount;
+                    rl.ReceiptLineType = ZimraEGS.ApiClient.Enums.ReceiptLineType.Discount;
                     rl.ReceiptLineNo = rw;
                     rl.ReceiptLineName = "Discount: " + GetFirstNonNullOrEmpty(l.LineDescription, l.Item.Name, l.Item.ItemName);
                     rl.ReceiptLineHSCode = HsCode;
                     rl.ReceiptLineQuantity = Math.Round(l.Qty, 2);
-                    rl.ReceiptLinePrice = Math.Round(-1 * (isIncludeTax ? unitPrice / (1 + (taxRate / 100)) : unitPrice), 4);
+                    //rl.ReceiptLinePrice = Math.Round(-1 * (isIncludeTax ? unitPrice / (1 + (taxRate / 100)) : unitPrice), 4);
+                    rl.ReceiptLinePrice = Math.Round(-1 * (unitPrice), 4);
 
                     if (relayData.ReceiptType == ReceiptType.DebitNote)
                     {
@@ -212,16 +232,16 @@ namespace ZimraEGS.Helpers
 
                     rl.ReceiptLineTotal = Math.Round(l.Qty * (double)rl.ReceiptLinePrice, 2);
 
-                    if (l.TaxCode != null && l.TaxCode.Name.Contains('|'))
+                    if (l.TaxCode != null && l.TaxCode.Name.Contains('—'))
                     {
-                        var taxcode = l.TaxCode.Name.Split('|');
-                        rl.TaxCode = taxcode[2].Trim();
+                        var taxcode = l.TaxCode.Name.Split('—');
+                        //rl.TaxCode = taxcode[2].Trim();
                         rl.TaxID = GetIntValue(taxcode[1].Trim());
                         rl.TaxPercent = rl.TaxID == 1 ? null : taxRate;
                     }
                     else
                     {
-                        rl.TaxCode = "A";
+                        //rl.TaxCode = "A";
                         rl.TaxID = 1;
                         rl.TaxPercent = null;
                     }
@@ -249,6 +269,41 @@ namespace ZimraEGS.Helpers
         {
             return int.TryParse(numString, out int value) ? value : 0;
         }
+
+        private List<ReceiptTax> GetNormalReceiptTaxs(List<ReceiptLine> receiptLines, bool taxInclusive)
+        {
+            List<ReceiptTax> ls = new List<ReceiptTax>();
+
+            foreach (ReceiptLine ln in receiptLines)
+            {
+                ReceiptTax receiptTax = new ReceiptTax();
+                //receiptTax.TaxCode = ln.TaxCode;
+                receiptTax.TaxID = ln.TaxID;
+                if (ln.TaxPercent != null) { receiptTax.TaxPercent = ln.TaxPercent; }
+
+                var tx = (double)(ln.TaxPercent == null ? 0 : ln.TaxPercent);
+                double tpersen = tx / 100;
+
+
+                if (taxInclusive)
+                {
+                    double excTaxAmount = ln.ReceiptLineTotal / (1 + tpersen);
+                    receiptTax.TaxAmount = Math.Round(ln.ReceiptLineTotal - excTaxAmount, 2);
+                    receiptTax.SalesAmountWithTax = ln.ReceiptLineTotal;
+                }
+                else
+                {
+                    receiptTax.TaxAmount = Math.Round(ln.ReceiptLineTotal * tpersen, 2);
+                    receiptTax.SalesAmountWithTax = ln.ReceiptLineTotal + receiptTax.TaxAmount;
+                }
+
+                receiptTax.LineNumber = ln.ReceiptLineNo;
+
+                ls.Add(receiptTax);
+            }
+
+            return ls.OrderBy(x => x.TaxID).OrderBy(x => x.LineNumber).ToList();
+        }
         private List<ReceiptTax> GetReceiptTaxs(List<ReceiptLine> receiptLines)
         {
             List<ReceiptTax> ls = new List<ReceiptTax>();
@@ -256,7 +311,7 @@ namespace ZimraEGS.Helpers
             foreach (ReceiptLine ln in receiptLines)
             {
                 ReceiptTax receiptTax = new ReceiptTax();
-                receiptTax.TaxCode = ln.TaxCode;
+                //receiptTax.TaxCode = ln.TaxCode;
                 receiptTax.TaxID = ln.TaxID;
                 if (ln.TaxPercent != null) { receiptTax.TaxPercent = ln.TaxPercent; }
 
@@ -282,7 +337,6 @@ namespace ZimraEGS.Helpers
 
             return groupedResult;
         }
-
         private List<Payment> GetPayments()
         {
             List<Payment> ls = new List<Payment>();
@@ -340,5 +394,33 @@ namespace ZimraEGS.Helpers
             }
             return sHash;
         }
+
+        //private string GetReceiptTaxsHash(List<ReceiptTax> receiptTaxs, string receiptCurrency)
+        //{
+        //    string sHash = string.Empty;
+
+        //    foreach (ReceiptTax tx in receiptTaxs)
+        //    {
+        //        string scode = "";
+        //        string tcode = receiptCurrency == "ZWG" ? tx.TaxCode : "";
+
+        //        if (tx.TaxID == 1)
+        //        {
+        //            scode += tcode + "0" + Math.Round(tx.SalesAmountWithTax * 100, 0).ToString();
+        //        }
+        //        else if (tx.TaxID == 2)
+        //        {
+        //            scode += tcode + "0.000" + (tx.SalesAmountWithTax * 100).ToString();
+        //        }
+        //        else if (tx.TaxID == 3 || tx.TaxID == 4)
+        //        {
+        //            scode += tcode + ((double)tx.TaxPercent).ToString("F2") + Math.Round(tx.TaxAmount * 100, 0).ToString() + Math.Round(tx.SalesAmountWithTax * 100, 0).ToString();
+        //        }
+
+        //        sHash += scode;
+        //    }
+        //    return sHash;
+        //}
+
     }
 }

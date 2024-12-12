@@ -1,7 +1,5 @@
-﻿using System.Text;
-using Zimra.ApiClient;
-using Zimra.ApiClient.Enums;
-using Zimra.ApiClient.Models;
+﻿using ZimraEGS.ApiClient.Enums;
+using ZimraEGS.ApiClient.Models;
 using ZimraEGS.Models;
 
 namespace ZimraEGS.Helpers
@@ -171,42 +169,6 @@ namespace ZimraEGS.Helpers
 
             return ls;
         }
-        public static CloseDayRequest GenerateCloseDayRequest(RelayData model)
-        {
-            var closeDayRequest = new CloseDayRequest();
-            try
-            {
-                closeDayRequest.FiscalDayNo = model.DeviceStatus.LastFiscalDayNo ?? 0;
-
-                closeDayRequest.FiscalDayCounters = GetFiscalDayCounter(model.FiscalDaySummary);
-
-                var counterHash = ToHashString(closeDayRequest.FiscalDayCounters.ToList());
-
-                string SourcesHash = model.CertificateInfo.DeviceID.ToString() +
-                    closeDayRequest.FiscalDayNo +
-                    model.DeviceStatus.FiscalDayClosed?.ToString("yyyy-MM-dd") +
-                    counterHash;
-
-                byte[] hashByte = DigitalSignatureUtility.ComputeHash(SourcesHash.ToUpper());
-                byte[] signatureByte = DigitalSignatureUtility.GenerateSignature(hashByte, model.CertificateInfo.PrivateKey);
-
-                closeDayRequest.FiscalDayDeviceSignature = new SignatureData()
-                {
-                    Hash = hashByte,
-                    Signature = signatureByte ?? Encoding.UTF8.GetBytes("")
-                };
-
-                closeDayRequest.ReceiptCounter = model.ReceiptCounterRef;
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-            return closeDayRequest;
-
-        }
-
         public static string ToHashString(this List<FiscalDayCounter> fiscalDayCounters)
         {
             var stringHash = string.Empty;
@@ -216,7 +178,7 @@ namespace ZimraEGS.Helpers
                 {
                     stringHash += item.FiscalCounterType.ToString();
                     stringHash += item.FiscalCounterCurrency;
-                    stringHash += item.FiscalCounterTaxPercent == null ? string.Empty : ((double)item.FiscalCounterTaxPercent).ToString("N2");
+                    stringHash += item.FiscalCounterTaxPercent == null ? string.Empty : ((double)item.FiscalCounterTaxPercent).ToString("F2");
                     stringHash += item.FiscalCounterValue * 100;
                 }
                 else if (item.FiscalCounterType == FiscalCounterType.BalanceByMoneyType)

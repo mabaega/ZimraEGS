@@ -25,6 +25,9 @@
         ? TaxPercent.Value.ToString("N2") 
         : string.Empty;
 
+        [Newtonsoft.Json.JsonIgnore]
+        public int LineNumber {  get; set; }
+
     }
 
 }

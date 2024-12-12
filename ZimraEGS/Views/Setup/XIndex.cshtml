@@ -138,7 +138,7 @@
                                             <div class="form-group">
                                                 <label style="color: var(--bs-success);" class="form-label" asp-for="@Model.CertificateInfo.IntegrationType">Integration Type</label>
                                                 <select asp-for="@Model.CertificateInfo.IntegrationType" class="form-control form-control-sm">
-                                                    @foreach (var value in Enum.GetValues(typeof(Zimra.ApiClient.Models.EnvironmentType)))
+                                                    @foreach (var value in Enum.GetValues(typeof(ZimraEGS.ApiClient.Models.PlatformType)))
                                                     {
                                                         <option value="@value">@value</option>
                                                     }

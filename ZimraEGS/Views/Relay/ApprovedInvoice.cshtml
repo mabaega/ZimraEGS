@@ -1,0 +1,104 @@
+﻿@using Newtonsoft.Json
+@using ZimraEGS.Helpers
+@model ApprovedInvoiceViewModel
+
+@{
+    ViewData["Title"] = "Zimra Integration Setup";
+    
+}
+
+<div class="container-fluid setup-container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Manager IO - Zimra Integration</h2>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8 mb-4">
+            <div class="card card-custom">
+                <div class="card-header section-header">
+                    <h5 class="mb-0">Receipt Reporting</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Current Receipt has been Reported and Approved by Zimra, Scan QRCode or Click Link to view Reporting Information.
+                    </p>
+                    <form id="approvedInvoiceForm">
+                        <!-- QR Code Section -->
+                        <div id="qrCodeImage"
+                             style="background-color: white; width: 140px; height: 140px; margin: 0 auto; border: 1px solid var(--bs-border-color-translucent); display: flex; align-items: center; justify-content: center;">
+                            <!-- QR code image will render here -->
+                        </div>
+
+                        <div class="text-break"
+                             style="text-align: center; margin-top: 15px; word-wrap: break-word; overflow-wrap: break-word; font-family: monospace; border: 1px solid var(--bs-border-color-translucent); padding: 8px; border-radius: 5px;background-color: var(--bs-card-cap-bg);">
+                            @if (!string.IsNullOrEmpty(Model.ReceiptQrCode))
+                            {
+                                <a href="@Model.ReceiptQrCode" target="_blank" style="color: inherit; text-decoration: none;">
+                                    @Html.Raw(Model.ReceiptQrCode)
+                                </a>
+                            }
+                        </div>
+
+                        <!-- Server Signature Section -->
+                        @if (Model.ReceiptReferenceJson != null)
+                        {
+                            <hr />
+                            <div class="mb-4 text-start">
+                                <label class="form-label">Receipt Approval Status</label>
+                                <textarea class="form-control" id="textareaResponse" rows="10" wrap="off" readonly>
+                                    @{
+                                        try
+                                        {
+                                            var formattedJson = Utils.SerializeObject(JsonConvert.DeserializeObject(Model.ReceiptReferenceJson));
+                                            @Html.Raw(formattedJson)
+                                            ;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            <text>Error processing the Manager invoice: @ex.Message</text>
+                                            ;
+                                        }
+                                    }
+                                    </textarea>
+                            </div>
+                        }
+                        <div class="mb-3 d-flex justify-content-between">
+                            <button type="button"
+                                    id="backToManager"
+                                    class="btn btn-secondary btn-sm"
+                                    style="width: 200px;"
+                                    name="backToManager"
+                                    onclick="window.location.href='@Model.Referrer'">
+                                Back to Manager
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/qrcode.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            function generateQRCode(text) {
+                new QRCode(document.getElementById("qrCodeImage"), {
+                    text: text,
+                    width: 120,
+                    height: 120,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.L
+                });
+            }
+
+            var ZimraQRCode = "@Model.ReceiptQrCode".replace(/&#x2B;/g, '+');
+            generateQRCode(ZimraQRCode);
+
+        });
+    </script>
+}

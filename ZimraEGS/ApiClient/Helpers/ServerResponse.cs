@@ -1,8 +1,8 @@
-﻿using System.Net;
+﻿using Newtonsoft.Json;
+using System.Net;
 using System.Net.Http.Headers;
-using Newtonsoft.Json;
 
-namespace ZimraEGS.Helpers
+namespace ZimraEGS.ApiClient.Helpers
 {
     public class ServerResponse
     {

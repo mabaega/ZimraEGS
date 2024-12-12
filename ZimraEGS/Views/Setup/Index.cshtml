@@ -86,7 +86,7 @@
                                     <div class="form-group">
                                         <label class="form-label" asp-for="@Model.CertificateInfo.IntegrationType">Integration Type</label>
                                         <select asp-for="@Model.CertificateInfo.IntegrationType" class="form-control form-control-sm">
-                                            @foreach (var value in Enum.GetValues(typeof(Zimra.ApiClient.Models.EnvironmentType)))
+                                            @foreach (var value in Enum.GetValues(typeof(ZimraEGS.ApiClient.Models.PlatformType)))
                                             {
                                                 <option value="@value">@value</option>
                                             }
@@ -357,10 +357,10 @@
                 try {
                     showLoading();
 
-                    const apiEndpoint = 'http://127.0.0.1:55667/api2'; // API endpoint
-                    const apiToken = 'CgpaaW1yYSBGRE1TEhIJ52Y8vcwJEUYRg5R3NKKN9lAaEgmdiuVby0+cThGjKsDLjgJdkw=='; // API token
+                    var apiEndpoint = '@Model.Api';
+                    var secretKey = '@Html.Raw(@Model.Token)';
 
-                    if (!apiEndpoint || !apiToken) {
+                    if (!apiEndpoint || !secretKey) {
                         alert('API Endpoint or Token is missing!');
                         hideLoading();
                         return;
@@ -384,7 +384,8 @@
                                     method: 'PUT',
                                     headers: {
                                         'Content-Type': 'application/json',
-                                        'X-API-KEY': apiToken
+                                        'Authorization': `Bearer ${secretKey}`
+                                        //'X-API-KEY': apiToken
                                     },
                                     body: JSON.stringify(item)
                                 });

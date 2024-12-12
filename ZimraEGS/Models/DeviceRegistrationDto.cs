@@ -1,6 +1,4 @@
-﻿using Zimra.ApiClient.Models;
-
-namespace ZimraEGS.Controllers
+﻿namespace ZimraEGS.Controllers
 {
     public partial class SetupController
     {
@@ -17,10 +15,10 @@ namespace ZimraEGS.Controllers
 
         public class VerifyTaxPayerDto
         {
-            public string IntegrationType { get; set; } 
-            public int DeviceID { get; set; } 
-            public string DeviceSerialNumber { get; set; } 
-            public string ActivationKey { get; set; } 
+            public string IntegrationType { get; set; }
+            public int DeviceID { get; set; }
+            public string DeviceSerialNumber { get; set; }
+            public string ActivationKey { get; set; }
         }
 
         public class GetConfigDto

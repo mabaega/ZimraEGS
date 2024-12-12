@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Zimra.ApiClient.Models;
+using System.Security.Cryptography;
+using System.Text;
+using ZimraEGS.ApiClient.Helpers;
+using ZimraEGS.ApiClient.Models;
 using ZimraEGS.Helpers;
 using ZimraEGS.Models;
 
@@ -45,12 +48,13 @@ namespace ZimraEGS.Controllers
             return RedirectToAction("Error", "Home");
         }
 
-        public IActionResult CloseDay(RelayData model)
+        public IActionResult CloseDay()
         {
-            if (TempData["RelayData"] is string relayDataJson)
+            if (TempData["CloseDayViewModel"] is string relayDataJson)
             {
-                var relayData = JsonConvert.DeserializeObject<RelayData>(relayDataJson);
-                return View(relayData);
+                string closeDayViewModel = TempData["CloseDayViewModel"].ToString();
+                CloseDayViewModel model = JsonConvert.DeserializeObject<CloseDayViewModel>(closeDayViewModel);
+                return View(model);
             }
 
             return RedirectToAction("Error", "Home");
@@ -93,7 +97,7 @@ namespace ZimraEGS.Controllers
                     {
                         var deviceStatus = deviceStatusResponse.GetContentAs<GetStatusResponse>();
 
-                        if (deviceStatus.FiscalDayStatus == Zimra.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed)
+                        if (deviceStatus.FiscalDayStatus == ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed)
                         {
                             return StatusCode((int)deviceStatusResponse.StatusCode, new { Error = deviceStatusResponse.GetFullResponseAsJson() });
                         }
@@ -112,7 +116,7 @@ namespace ZimraEGS.Controllers
                             IntegrationType = model.IntegrationType,
                             DeviceID = model.DeviceID,
                             DeviceSerialNumber = model.DeviceSerialNumber,
-                            FiscalDayOpened = openDayRequest.FiscalDayOpened.ToString("yyyy-MM-ddTHH:mm:ss"),
+                            FiscalDayOpened = openDayRequest.FiscalDayOpened,
                             FiscalDayStatus = model.FiscalDayStatus,
                             LastFiscalDayNo = model.LastFiscalDayNo,
                             LastReceiptGlobalNo = model.LastReceiptGlobalNo
@@ -124,15 +128,15 @@ namespace ZimraEGS.Controllers
                         // Create combined object for API call
                         var combinedApiObject = new
                         {
+                            OpenDayRequest = openDayRequest,
+                            OpenDayResponse = openDayResponse.GetContentAs<OpenDayResponse>(),
+                            GetStatusResponse = deviceStatus,
                             ApiReference = new
                             {
                                 ApiUrl = $"{model.Api}/business-details-form/38cf4712-6e95-4ce1-b53a-bff03edad273",
                                 SecretKey = model.Token,
                                 Payload = businessJson
-                            },
-                            OpenDayRequest = openDayRequest,
-                            OpenDayResponse = openDayResponse.GetContentAs<OpenDayResponse>(),
-                            GetStatusResponse = deviceStatus
+                            }
                         };
 
                         // Serialize the combined object to JSON
@@ -151,23 +155,74 @@ namespace ZimraEGS.Controllers
             }
         }
 
-        public async Task<IActionResult> AjaxCloseDay([FromForm] RelayData model)
+        public async Task<IActionResult> AjaxCloseDay([FromForm] CloseDayViewModel model)
         {
             try
             {
-                var deviceID = model.CertificateInfo.DeviceID;
-                var deviceModelName = model.CertificateInfo.DeviceModelName;
-                var deviceModelVersion = model.CertificateInfo.DeviceModelVersion;
+                string jsonBusiness = model.BusinessDetailJson;
 
-                CloseDayRequest CloseDayRequest = FiscalDayProcessor.GenerateCloseDayRequest(model);
+                BusinessReference BusinessReference = new BusinessReference();
+                FiscalDaySummary FiscalDaySummary = new FiscalDaySummary();
+                CertificateInfo CertificateInfo = new CertificateInfo();
 
-                ApiHelper apiHelper = new ApiHelper(model.CertificateInfo.Base64Pfx, model.CertificateInfo.IntegrationType);
+                string brf = RelayDataHelper.FindStringValueInJson(jsonBusiness, ManagerCustomField.BusinessReferenceGuid);
+                if (!string.IsNullOrEmpty(brf))
+                {
+                    BusinessReference = JsonConvert.DeserializeObject<BusinessReference>(brf);
+                }
+
+                string fds = RelayDataHelper.FindStringValueInJson(jsonBusiness, ManagerCustomField.FiscalDaySummaryGuid);
+                if (!string.IsNullOrEmpty(fds))
+                {
+                    FiscalDaySummary = JsonConvert.DeserializeObject<FiscalDaySummary>(fds);
+                }
+
+                var base64CerInfo = RelayDataHelper.FindStringValueInJson(jsonBusiness, ManagerCustomField.CertificateInfoGuid);
+                if (!string.IsNullOrEmpty(base64CerInfo))
+                {
+                    CertificateInfo = ObjectCompressor.DeserializeFromBase64String<CertificateInfo>(base64CerInfo);
+                }
+
+                var deviceID = CertificateInfo.DeviceID;
+                var deviceModelName = CertificateInfo.DeviceModelName;
+                var deviceModelVersion = CertificateInfo.DeviceModelVersion;
+
+                var closeDayRequest = new CloseDayRequest();
+
+                closeDayRequest.FiscalDayNo = BusinessReference.LastFiscalDayNo;
+
+                closeDayRequest.FiscalDayCounters = FiscalDayProcessor.GetFiscalDayCounter(FiscalDaySummary);
+
+                var counterHash = FiscalDayProcessor.ToHashString(closeDayRequest.FiscalDayCounters.ToList());
+
+                string SourcesHash = CertificateInfo.DeviceID.ToString("F0") +
+                    closeDayRequest.FiscalDayNo +
+                    BusinessReference.FiscalDayOpened.ToString("yyyy-MM-dd") +
+                    counterHash;
+
+                Console.WriteLine(SourcesHash);
+
+                byte[] hashByte = RSA_CryptoHelper.ComputeSHA256Hash(SourcesHash.ToUpper());
+
+                RSA privateKey = RSA_CryptoHelper.ConvertPrivateKeyFromBase64(CertificateInfo.PrivateKey);
+                byte[] signatureByte = RSA_CryptoHelper.SignDocument(privateKey, hashByte);
+
+                closeDayRequest.FiscalDayDeviceSignature = new SignatureData()
+                {
+                    Hash = hashByte,
+                    Signature = signatureByte ?? Encoding.UTF8.GetBytes("")
+                };
+
+                closeDayRequest.ReceiptCounter = BusinessReference.LastReceiptCounter;
+
+
+                ApiHelper apiHelper = new ApiHelper(CertificateInfo.Base64Pfx, CertificateInfo.IntegrationType);
                 ServerResponse closeDayResponse = await apiHelper.SendPostRequestAsync<CloseDayRequest>(
                     "CloseDay",
                     deviceID,
                     deviceModelName,
                     deviceModelVersion,
-                    CloseDayRequest
+                    closeDayRequest
                 );
 
                 GetStatusResponse deviceStatus;
@@ -186,61 +241,28 @@ namespace ZimraEGS.Controllers
                     {
                         deviceStatus = statusresponse.GetContentAs<GetStatusResponse>();
 
-                        if (deviceStatus.FiscalDayStatus != Zimra.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed)
+                        if (deviceStatus.FiscalDayStatus != ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed || deviceStatus.FiscalDayStatus != ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayCloseInitiated)
                         {
-                            return StatusCode((int)statusresponse.StatusCode, new { Error = statusresponse.GetFullResponseAsJson() });
+                            return StatusCode((int)System.Net.HttpStatusCode.BadRequest, new { Error = statusresponse.GetFullResponseAsJson() });
                         }
-                    }
-                    else
-                    {
-                        return StatusCode((int)statusresponse.StatusCode, new { Error = statusresponse.GetFullResponseAsJson() });
-                    }
 
-
-                    var businessJson = model.BusinessDetailJson;
-
-                    businessJson = RelayDataHelper.ModifyStringCustomFields2(businessJson, ManagerCustomField.FiscalDaySummaryGuid, null);
-
-                    BusinessReference businessReference = new BusinessReference();
-                    if (model.BusinessReference != null)
-                    {
-                        businessReference = model.BusinessReference;
-                        businessReference.LastReceiptHash = model.BusinessReference.LastReceiptHash;
-                    }
-
-                    businessReference.IntegrationType = model.CertificateInfo.IntegrationType;
-                    businessReference.DeviceID = model.CertificateInfo.DeviceID;
-                    businessReference.DeviceSerialNumber = model.CertificateInfo.DeviceSerialNumber;
-                    businessReference.FiscalDayStatus = Zimra.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed;
-
-                    businessReference.LastFiscalDayNo = deviceStatus.LastFiscalDayNo ?? 0;
-                    businessReference.LastReceiptGlobalNo = deviceStatus.LastReceiptGlobalNo;
-                    businessReference.LastReceiptCounter = 0;
-
-                    businessJson = RelayDataHelper.ModifyStringCustomFields2(businessJson, ManagerCustomField.BusinessReferenceGuid, JsonConvert.SerializeObject(businessReference, Formatting.Indented));
-                    
-                    // Create combined object
-                    var combinedApiObject = new
-                    {
-                        ApiReference = new
+                        // Create combined object
+                        var combinedApiObject = new
                         {
-                            ApiUrl = $"{model.Api}/business-details-form/38cf4712-6e95-4ce1-b53a-bff03edad273",
-                            SecretKey = model.Token,
-                            Payload = businessJson
-                        },
+                            closeDayRequest,
+                            CloseDayResponse = closeDayResponse.GetContentAs<CloseDayResponse>(),
+                            GetStatusResponse = deviceStatus,
+                        };
 
-                        CloseDayRequest,
-                        CloseDayResponse = closeDayResponse.GetContentAs<CloseDayResponse>(),
-                        GetStatusResponse = deviceStatus
-                    };
+                        // Serialize combined object to JSON
+                        string combinedJson = JsonConvert.SerializeObject(combinedApiObject, Formatting.Indented);
 
-                    // Serialize combined object to JSON
-                    string combinedJson = JsonConvert.SerializeObject(combinedApiObject, Formatting.Indented);
-
-                    return Ok(combinedJson);
+                        return Ok(combinedJson);
+                    }
                 }
 
                 return StatusCode((int)closeDayResponse.StatusCode, closeDayResponse.GetContentAsString());
+
             }
             catch (Exception ex)
             {
@@ -289,12 +311,12 @@ namespace ZimraEGS.Controllers
 
                         CertificateInfo newCertificateInfo = model.CertificateInfo;
                         newCertificateInfo.DeviceCertificate = Utilities.CleanBase64String(issuedCertificate.Certificate);
-                        string pfxbyte = CertificateHelper.GeneratePfxBase64(Utilities.CleanBase64String(model.CertificateInfo.PrivateKey), newCertificateInfo.DeviceCertificate, (string)null);
+                        string pfxbyte = Utilities.GeneratePfx(Utilities.CleanBase64String(model.CertificateInfo.PrivateKey), newCertificateInfo.DeviceCertificate, (string)null);
                         newCertificateInfo.Base64Pfx = pfxbyte;
                         newCertificateInfo.CertificateValidTill = deviceConfig.CertificateValidTill;
 
-                        model.CertificateInfo= newCertificateInfo;
-                        string Base64Certificate = ObjectCompressor.SerializeToBase64String( newCertificateInfo );
+                        model.CertificateInfo = newCertificateInfo;
+                        string Base64Certificate = ObjectCompressor.SerializeToBase64String(newCertificateInfo);
 
                         // Modify the business JSON with the new values
                         var businessJson = model.BusinessDetailJson;
@@ -303,14 +325,14 @@ namespace ZimraEGS.Controllers
                         // Create combined object for API call
                         var combinedApiObject = new
                         {
+                            CertificateInfo = model.CertificateInfo,
+                            IssueCertificateResponse = issueCertificateResponse.GetFullResponseAsJson(),
                             ApiReference = new
                             {
                                 ApiUrl = $"{model.Api}/business-details-form/38cf4712-6e95-4ce1-b53a-bff03edad273",
                                 SecretKey = model.Token,
                                 Payload = businessJson
-                            },
-                            CertificateInfo = model.CertificateInfo,
-                            IssueCertificateResponse = issueCertificateResponse.GetContentAsString()
+                            }
                         };
 
                         // Serialize the combined object to JSON

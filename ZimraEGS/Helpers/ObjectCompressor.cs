@@ -35,7 +35,7 @@ namespace ZimraEGS.Helpers
 
                 return JsonConvert.DeserializeObject<T>(jsonString);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return default;
             }

@@ -31,9 +31,9 @@
         [Newtonsoft.Json.JsonProperty("receiptLineTotal", Required = Newtonsoft.Json.Required.Always)]
         public double ReceiptLineTotal { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("taxCode", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [System.ComponentModel.DataAnnotations.StringLength(3)]
-        public string TaxCode { get; set; }
+        //[Newtonsoft.Json.JsonProperty("taxCode", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        //[System.ComponentModel.DataAnnotations.StringLength(3)]
+        //public string TaxCode { get; set; }
 
         [Newtonsoft.Json.JsonProperty("taxPercent", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public double? TaxPercent { get; set; }

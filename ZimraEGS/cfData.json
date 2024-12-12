@@ -113,7 +113,7 @@
     {
       "Key": "51285cd8-0cfb-402c-9a3b-b1775cd16ce6",
       "Label": "Non-VAT WHT",
-      "Name": "Non-VAT Withholding Tax | 514 | WHT",
+      "Name": "Non-VAT Withholding Tax — 514",
       "Rate": 5,
       "TaxRate": "CustomRate",
       "Type": "SingleRate"
@@ -121,7 +121,7 @@
     {
       "Key": "d45ffe42-182a-4920-a5c6-dd2fd983794a",
       "Label": "15% VAT",
-      "Name": "Standard rated 15%) | 3 | C",
+      "Name": "Standard rated 15%) — 3",
       "Rate": 15,
       "TaxRate": "CustomRate",
       "Type": "SingleRate"
@@ -129,7 +129,7 @@
     {
       "Key": "693aa908-e2ae-4a4a-997f-b23cc056d7fd",
       "Label": "0% VAT",
-      "Name": "Zero rated 0% | 2 | B",
+      "Name": "Zero rated 0% — 2",
       "Rate": 0.0,
       "TaxRate": "CustomRate",
       "Type": "SingleRate"
@@ -137,13 +137,24 @@
     {
       "Key": "6d0a93d1-a251-4509-94d2-9c1b2ade93b3",
       "Label": "VAT (Exempt)",
-      "Name": "Exempt | 1 | A",
+      "Name": "Exempt — 1",
       "Rate": 0.0,
       "TaxRate": "CustomRate",
       "Type": "SingleRate"
     }
   ],
   "text-custom-field-form": [
+    {
+      "DisplayOnView": true,
+      "Key": "fc6f05f9-50c7-46c0-b9f5-7fe0ca83cf2a",
+      "Name": "Approval Status",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 39,
+      "Size": "Medium"
+    },
     {
       "DisplayOnView": true,
       "Key": "a0454495-cae8-43ef-a418-4dad69427e78",
@@ -175,9 +186,20 @@
       "Position": 50
     },
     {
+      "DisplayOnView": true,
+      "Key": "39b3d219-a386-4d9f-b3a0-55968b4bc7b7",
+      "Name": "Receipt Date",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 99,
+      "Size": "Medium"
+    },
+    {
       "Key": "75190339-992a-4fb0-bf79-f5f8226edb4b",
       "Name": "Receipt Reference",
-      "Description": "<script>\ndocument.addEventListener('DOMContentLoaded', function () {\n    const MakeHidden = labels => updateFields(labels, 'hide');\n\tconst MakeReadonly = labels => updateFields(labels, 'readonly');\n\tconst MakeReadonlyAndHide = labels => updateFields(labels, 'readonlyandhide');\n\tfunction updateFields(labels, action) {\n\t\tconst customFieldset = [...document.querySelectorAll('fieldset')].find(fieldset => fieldset.querySelector('legend')?.textContent.trim() === 'Custom Fields');\n\t\tif (!customFieldset) return console.error('Custom Fields fieldset not found');\n\t\tcustomFieldset.querySelectorAll('.form-group').forEach(group => {\n\t\t\tconst label = group.querySelector('label'), input = group.querySelector('input, textarea'), dropdown = group.querySelector('.vs__dropdown-toggle');\n\t\t\tif (label && labels.includes(label.textContent.trim())) {\n\t\t\t\tif (action === 'hide') group.style.display = 'none';\n\t\t\t\telse if (action === 'readonly' && input) input.setAttribute('readonly', 'true');\n\t\t\t\telse if (action === 'readonlyandhide') { if (input) input.setAttribute('readonly', 'true'); group.style.display = 'none'; }\n\t\t\t\tif (dropdown) {\n\t\t\t\t\tconst searchInput = dropdown.querySelector('input.vs__search'), clearButton = dropdown.querySelector('.vs__clear');\n\t\t\t\t\tif (action === 'readonly' || action === 'readonlyandhide') {\n\t\t\t\t\t\tdropdown.setAttribute('disabled', 'true');\n\t\t\t\t\t\tif (searchInput) searchInput.setAttribute('readonly', 'true');\n\t\t\t\t\t\tif (clearButton) clearButton.style.display = 'none';\n\t\t\t\t\t\tdropdown.style.pointerEvents = 'none';\n\t\t\t\t\t}\n\t\t\t\t\tif (action === 'hide' || action === 'readonlyandhide') dropdown.style.pointerEvents = 'none';\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t}\n    MakeReadonly(['Receipt QRCode', 'Verification Code', 'Receipt Reference']);\n    MakeReadonlyAndHide(['Device ID', 'Device SN','ReceiptCounter','ReceiptGlobalNo','FiscalDayNo']);\n});\n</script>",
+      "Description": "<script>\ndocument.addEventListener('DOMContentLoaded', function () {\n    const MakeHidden = labels => updateFields(labels, 'hide');\n\tconst MakeReadonly = labels => updateFields(labels, 'readonly');\n\tconst MakeReadonlyAndHide = labels => updateFields(labels, 'readonlyandhide');\n\tfunction updateFields(labels, action) {\n\t\tconst customFieldset = [...document.querySelectorAll('fieldset')].find(fieldset => fieldset.querySelector('legend')?.textContent.trim() === 'Custom Fields');\n\t\tif (!customFieldset) return console.error('Custom Fields fieldset not found');\n\t\tcustomFieldset.querySelectorAll('.form-group').forEach(group => {\n\t\t\tconst label = group.querySelector('label'), input = group.querySelector('input, textarea'), dropdown = group.querySelector('.vs__dropdown-toggle');\n\t\t\tif (label && labels.includes(label.textContent.trim())) {\n\t\t\t\tif (action === 'hide') group.style.display = 'none';\n\t\t\t\telse if (action === 'readonly' && input) input.setAttribute('readonly', 'true');\n\t\t\t\telse if (action === 'readonlyandhide') { if (input) input.setAttribute('readonly', 'true'); group.style.display = 'none'; }\n\t\t\t\tif (dropdown) {\n\t\t\t\t\tconst searchInput = dropdown.querySelector('input.vs__search'), clearButton = dropdown.querySelector('.vs__clear');\n\t\t\t\t\tif (action === 'readonly' || action === 'readonlyandhide') {\n\t\t\t\t\t\tdropdown.setAttribute('disabled', 'true');\n\t\t\t\t\t\tif (searchInput) searchInput.setAttribute('readonly', 'true');\n\t\t\t\t\t\tif (clearButton) clearButton.style.display = 'none';\n\t\t\t\t\t\tdropdown.style.pointerEvents = 'none';\n\t\t\t\t\t}\n\t\t\t\t\tif (action === 'hide' || action === 'readonlyandhide') dropdown.style.pointerEvents = 'none';\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t}\n    MakeReadonly(['Receipt QRCode', 'Verification Code', 'Approval Status', 'Receipt Reference']);\n    MakeReadonlyAndHide(['Device ID', 'Device SN','ReceiptCounter','ReceiptGlobalNo','FiscalDayNo']);\n});\n</script>",
       "Placement": [
         "ad12b60b-23bf-4421-94df-8be79cef533e",
         "245e5943-0092-409d-96ae-e2ee10eac75b"

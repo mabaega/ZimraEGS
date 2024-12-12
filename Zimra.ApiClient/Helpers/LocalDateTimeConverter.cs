@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Globalization;
 
 namespace Zimra.ApiClient.Helpers
@@ -43,13 +42,13 @@ namespace Zimra.ApiClient.Helpers
             }
 
             // Log the input string before processing
-            Console.WriteLine($"Received Date String: {value}");
+            //Console.WriteLine($"Received Date String: {value}");
 
             // Handle the local time date formats
             if (DateTime.TryParseExact(value, SupportedDateFormats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var localDateTime))
             {
                 // Log the local date parsed
-                Console.WriteLine($"Parsed Local DateTime: {localDateTime}");
+                //Console.WriteLine($"Parsed Local DateTime: {localDateTime}");
 
                 // Return DateTimeOffset in local time
                 return new DateTimeOffset(localDateTime, TimeZoneInfo.Local.GetUtcOffset(localDateTime));

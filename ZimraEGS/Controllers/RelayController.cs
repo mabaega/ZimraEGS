@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Zimra.ApiClient.Enums;
-using Zimra.ApiClient.Models;
+using ZimraEGS.ApiClient.Enums;
+using ZimraEGS.ApiClient.Helpers;
+using ZimraEGS.ApiClient.Models;
 using ZimraEGS.Helpers;
 using ZimraEGS.Models;
 
@@ -53,7 +54,7 @@ namespace ZimraEGS.Controllers
                     {
                         // Check Certificate Valid
                         TimeSpan dateDifference = relayData.CertificateInfo.CertificateValidTill - DateTimeOffset.Now;
-                        if (dateDifference.TotalDays < 10)
+                        if (dateDifference.TotalDays < 30)
                         {
                             CertInfoViewModel certIfoVew = new CertInfoViewModel
                             {
@@ -75,13 +76,14 @@ namespace ZimraEGS.Controllers
                     }
                     else
                     {
-                        // Check if invoice Has been Aproved
-                        if(relayData.ApprovalStatus == "APPROVED")
+                        // Check if invoice Has been Approved
+                        // Check if invoice has been approved
+                        if (relayData.ApprovalStatus == "APPROVED")
                         {
-                            CloseDayViewModel closeDayViewModel = relayData.GetCloseDayViewModel();
-                            TempData["CloseDayViewModel"] = JsonConvert.SerializeObject(closeDayViewModel);
-                            return RedirectToAction("CloseDay", "FiscalDevice");
-                        }else if(string.IsNullOrEmpty(relayData.ApprovalStatus) &&  relayData.BusinessReference.LastApprovalStatus == "REJECTED")
+                            ApprovedInvoiceViewModel approvedInvoiceViewModel = relayData.GetApprovedInvoiceViewModel();
+                            return View("ApprovedInvoice", approvedInvoiceViewModel);
+                        }
+                        else if (string.IsNullOrEmpty(relayData.ApprovalStatus) && relayData.BusinessReference.LastApprovalStatus == "REJECTED")
                         {
                             return RedirectToAction("Error", "Home");
                         }
@@ -108,7 +110,6 @@ namespace ZimraEGS.Controllers
                     return StatusCode((int)configresponse.StatusCode, new { Error = configresponse.GetFullResponseAsJson() });
                 }
 
-
                 ReceiptHelper rh = new ReceiptHelper(relayData);
                 relayData.Receipt = rh.GenerateZimraReceipt();
 
@@ -122,6 +123,7 @@ namespace ZimraEGS.Controllers
                 return StatusCode(500, new { Error = $"Internal server error: {ex.Message}" });
             }
         }
+        
 
         public async Task<IActionResult> AjaxSubmitReceipt([FromForm] RelayDataViewModel model)
         {
@@ -149,7 +151,7 @@ namespace ZimraEGS.Controllers
                     payload
                 );
 
-                GetStatusResponse getStatusResponse = new GetStatusResponse();
+                //GetStatusResponse getStatusResponse;
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -174,15 +176,17 @@ namespace ZimraEGS.Controllers
                     var invoiceJson = model.InvoiceJson;
 
                     invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, ManagerCustomField.ApprovalStatusGuid, ApprovalStatus);
-                    invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, model.ReceiptType == ReceiptType.FiscalInvoice ? "IssueDate" : "Date", model.InvoiceDate);
-                    invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, "Reference", model.InvoiceNumber);
+                    invoiceJson = RelayDataHelper.UpdateOrCreateField(invoiceJson, model.ReceiptType == ReceiptType.FiscalInvoice ? "IssueDate" : "Date", model.InvoiceDate);
+                    invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, ManagerCustomField.ReceiptDateGuid, model.InvoiceDate.ToString("yyyy-MM-ddTHH:mm:ss"));
+
+                    invoiceJson = RelayDataHelper.UpdateOrCreateField(invoiceJson, "Reference", model.InvoiceNumber);
 
                     InvoiceReference invoiceReference = new InvoiceReference();
                     invoiceReference.ApprovalStatus = ApprovalStatus;
                     invoiceReference.ReceiptHash = model.ReceiptHash;
                     invoiceReference.ReceiptSignature = model.ReceiptSignature;
                     invoiceReference.SubmitReceiptResponse = submitReceiptResponse;
-                    
+
                     model.InvoiceReferenceJson = JsonConvert.SerializeObject(invoiceReference, Formatting.Indented);
 
                     invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, ManagerCustomField.ReceiptReferenceGuid, model.InvoiceReferenceJson);
@@ -228,13 +232,13 @@ namespace ZimraEGS.Controllers
                     businessreference.DeviceSerialNumber = model.DeviceSN;
                     businessreference.FiscalDayStatus = model.FiscalDayStatus;
                     businessreference.LastFiscalDayNo = model.FiscalDayNo;
+
                     businessreference.LastApprovalStatus = ApprovalStatus;
 
                     businessreference.LastReceiptCounter = model.ReceiptCounter;
 
                     if (ApprovalStatus == "APPROVED")
                     {
-
                         businessreference.LastReceiptGlobalNo = model.ReceiptGlobalNo;
                         businessreference.LastReceiptHash = model.ReceiptHash;
 
@@ -264,7 +268,7 @@ namespace ZimraEGS.Controllers
                     {
                         ApiInvoice = new
                         {
-                            ApiUrl = Utilities.ConstructInvoiceApiUrl(model.Referrer, model.FormKey),
+                            ApiUrl = Utils.ConstructInvoiceApiUrl(model.Referrer, model.FormKey),
                             SecretKey = model.Token,
                             Payload = invoiceJson
                         },
@@ -275,7 +279,7 @@ namespace ZimraEGS.Controllers
                             Payload = businessJson
                         },
                         SubmitReceiptResponse = submitReceiptResponse,
-                        GetStatusResponse = getStatusResponse
+                        //GetStatusResponse = getStatusResponse
                     };
 
                     // Serialize combined object to JSON

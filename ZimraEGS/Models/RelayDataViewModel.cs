@@ -1,8 +1,11 @@
-﻿using Zimra.ApiClient.Enums;
-using Zimra.ApiClient.Models;
+﻿using Newtonsoft.Json;
+using ZimraEGS.ApiClient.Enums;
+using ZimraEGS.ApiClient.Helpers;
+using ZimraEGS.ApiClient.Models;
 
 namespace ZimraEGS.Models
 {
+
     public class RelayDataViewModel
     {
         public string Referrer { get; set; } = string.Empty;
@@ -11,7 +14,10 @@ namespace ZimraEGS.Models
         public string Token { get; set; } = string.Empty;
 
         public string InvoiceNumber { get; set; } = string.Empty;
-        public string InvoiceDate { get; set; } = string.Empty;
+
+        [JsonProperty("InvoiceDate")]
+        [Newtonsoft.Json.JsonConverter(typeof(LocalDateTimeConverter))]
+        public DateTimeOffset InvoiceDate { get; set; }
         public double InvoiceTotal { get; set; } = 0;
         public string BuyerRegisterName { get; set; } = string.Empty;
         public double InvoiceRoundOff { get; set; } = 0;
@@ -21,17 +27,17 @@ namespace ZimraEGS.Models
         public string DeviceModelName { get; set; } = string.Empty;
         public string DeviceModelVersion { get; set; } = string.Empty;
 
-        public EnvironmentType IntegrationType { get; set; } = EnvironmentType.Simulation;
+        public PlatformType IntegrationType { get; set; } = PlatformType.Simulation;
         public string Base64Pfx { get; set; } = string.Empty;
-        public string PrivateKey {  get; set; } = string.Empty;
+        public string PrivateKey { get; set; } = string.Empty;
 
         public FiscalDayStatus FiscalDayStatus { get; set; } = FiscalDayStatus.FiscalDayClosed;
         public int FiscalDayNo { get; set; } = 0;
         public int ReceiptGlobalNo { get; set; } = 0;
         public int ReceiptCounter { get; set; } = 0;
-        
+
         public string FiscalDayOpened { get; set; } = string.Empty;
-        public string FiscalDaySummaryJson {  get; set; }
+        public string FiscalDaySummaryJson { get; set; }
 
         public string ReceiptNotes { get; set; } = string.Empty;
         public int DeviceIDRef { get; set; } = 0;
@@ -55,13 +61,14 @@ namespace ZimraEGS.Models
         public string ReceiptVerificationCode { get; set; }
         public string TmpReceiptVerificationCode { get; set; }
 
-        public string BusinessDetailJson { get; set; } = string.Empty;
         public string InvoiceJson { get; set; }
         public string ReceiptJson { get; set; }
 
+        public string BusinessDetailJson { get; set; } = string.Empty;
         public string InvoiceReferenceJson { get; set; }
         public string BusinessReferenceJson { get; set; }
 
+        public bool TimeForCloseDay { get; set; }
         public RelayDataViewModel() { }
 
     }
