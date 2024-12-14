@@ -58,7 +58,95 @@
     </div>
 </div>
 
-<div class="loading-indicator" id="loadingIndicator" style="display: none;">
+<div class="loading-indicator" id="loadingIndicator"></div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function showLoading() {
+                $('#loadingIndicator').show();
+            }
+
+            function hideLoading() {
+                $('#loadingIndicator').hide();
+            }
+
+            $('#openDayButton').click(function (e) {
+                e.preventDefault();
+                var $btn = $(this);
+
+                // Show the loading indicator
+                showLoading();
+
+                var formData = $('#openDayForm').serialize(); // Serialize the form data
+
+                $.ajax({
+                    url: '@Url.Action("AjaxOpenDay")',
+                    method: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        console.log(response);
+                        try {
+                            if (typeof response === 'string') {
+                                response = JSON.parse(response);
+                            }
+
+                            var message = "";
+
+                            // Process API reference update
+                            if (response.ApiReference) {
+                                const apiRef = response.ApiReference;
+
+                                console.log(JSON.stringify(apiRef.Payload))
+
+                                fetch(apiRef.ApiUrl, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${apiRef.SecretKey}`
+                                    },
+                                    body: apiRef.Payload
+                                }).then(apiRefResponse => {
+                                    if (apiRefResponse.ok) {
+                                        console.log('Update Zimra Reference successful!');
+                                        message += 'Update Zimra Reference: successful\n';
+                                    } else {
+                                        message += 'Update Zimra Reference Error: Network response was not ok.\n';
+                                    }
+                                }).catch(error => {
+                                    console.error(`Update Zimra Reference Error: ${error.message}`);
+                                    message += `Update Zimra Reference Error: ${error.message}\n`;
+                                });
+                            }
+
+                            // Display response in textarea
+                            var formattedJson = JSON.stringify(response, null, 4);
+                            $('#textareaResponse').val(formattedJson);
+
+                            // Update button states dynamically
+                            $btn.prop('disabled', true); // Disable the button after click
+                            $btn.text('FiscalDay Opened');
+
+                        } catch (err) {
+                            $('#textareaResponse').val('Error processing response: ' + err.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $('#textareaResponse').val('Error: ' + xhr.responseText);
+                    },
+                    complete: function () {
+                        hideLoading(); // Hide the loading indicator
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+
+
+
+@* <div class="loading-indicator" id="loadingIndicator" style="display: none;">
     <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
@@ -136,3 +224,4 @@
         });
     </script>
 }
+ *@

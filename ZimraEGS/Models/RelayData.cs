@@ -13,12 +13,14 @@ namespace ZimraEGS.Models
         public string Data { get; private set; } = string.Empty;
         public string Api { get; private set; } = string.Empty;
         public string Token { get; private set; } = string.Empty;
-        public double InvoiceTotal { get; private set; } = 0;
 
+        public long EGSVersion { get; private set; }
+        
+        public double InvoiceTotal { get; private set; } = 0;
         public string ApprovalStatus { get; set; } = string.Empty;
         public int InvReceiptGlobalNo { get; private set; } = 0;
 
-        public DateTimeOffset? InvReceiptDate { get; private set; }
+        public DateTimeOffset? ReceiptDate { get; private set; }
 
         public string BusinessDetailJson { get; set; } = string.Empty;
         public string InvoiceJson { get; set; } = string.Empty;
@@ -35,8 +37,10 @@ namespace ZimraEGS.Models
         public int FiscalDayNoRef { get; private set; }
         public int ReceiptCounterRef { get; private set; }
         public int ReceiptGlobalNoRef { get; private set; }
-        public int ReceiptRefNo { get; set; } = 0;
-        public string ReceiptRefDate { get; set; } = string.Empty;
+        public string ReceiptRefNo { get; set; }
+
+        [Newtonsoft.Json.JsonConverter(typeof(LocalDateTimeConverter))]
+        public DateTimeOffset ReceiptRefDate { get; set; } = DateTimeOffset.MinValue;
 
         public string ReceiptPrintForm { get; private set; } = string.Empty;
         public string PaymentType1 { get; private set; } = string.Empty;
@@ -46,6 +50,7 @@ namespace ZimraEGS.Models
 
         public string ReceiptQrCode { get; set; } = string.Empty;
         public string VerificationCode { get; set; } = string.Empty;
+        public long ReceiptID {  get; set; }
 
         public string BuyerRegisterName { get; private set; } = string.Empty;
         public string BuyerTradeName { get; private set; } = string.Empty;
@@ -57,6 +62,7 @@ namespace ZimraEGS.Models
         public string BuyerCity { get; private set; } = string.Empty;
         public string BuyerStreet { get; private set; } = string.Empty;
         public string BuyerHouseNo { get; private set; } = string.Empty;
+
         public ManagerInvoice ManagerInvoice { get; private set; }
         public GetStatusResponse DeviceStatus { get; set; }
         public GetConfigResponse DeviceConfig { get; set; }
@@ -90,61 +96,61 @@ namespace ZimraEGS.Models
         }
         private void InitializeBusinessData(string jsonBusiness)
         {
-            string brf = RelayDataHelper.FindStringValueInJson(jsonBusiness, ManagerCustomField.BusinessReferenceGuid);
+            string brf = RelayDataHelper.GetStringCustomField2Value(jsonBusiness, ManagerCustomField.BusinessReferenceGuid);
             if (!string.IsNullOrEmpty(brf))
             {
                 BusinessReference = JsonConvert.DeserializeObject<BusinessReference>(brf);
             }
 
-            string fds = RelayDataHelper.FindStringValueInJson(jsonBusiness, ManagerCustomField.FiscalDaySummaryGuid);
+            string fds = RelayDataHelper.GetStringCustomField2Value(jsonBusiness, ManagerCustomField.FiscalDaySummaryGuid);
             if (!string.IsNullOrEmpty(fds))
             {
                 FiscalDaySummary = JsonConvert.DeserializeObject<FiscalDaySummary>(fds);
             }
 
-            var base64CerInfo = RelayDataHelper.FindStringValueInJson(jsonBusiness, ManagerCustomField.CertificateInfoGuid);
+            var base64CerInfo = RelayDataHelper.GetStringCustomField2Value(jsonBusiness, ManagerCustomField.CertificateInfoGuid);
             if (!string.IsNullOrEmpty(base64CerInfo))
             {
                 CertificateInfo = ObjectCompressor.DeserializeFromBase64String<CertificateInfo>(base64CerInfo);
             }
+
+            EGSVersion = VersionHelper.GetNumberOnly(RelayDataHelper.GetStringCustomField2Value(jsonBusiness, ManagerCustomField.AppVersionGuid));
         }
 
         private void InitializeInvoiceData(string jsonInvoice)
         {
-            ApprovalStatus = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.ApprovalStatusGuid);
+            ApprovalStatus = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.ApprovalStatusGuid);
 
             if (!string.IsNullOrEmpty(ApprovalStatus))
             {
                 InvReceiptGlobalNo = GetIntValue(jsonInvoice, ManagerCustomField.ReceiptGlobalNoGuid);
-                //InvReceiptDate = GetDateTimeValue(jsonInvoice, "IssueDate") ?? GetDateTimeValue(jsonInvoice, "Date");
-                InvReceiptDate = GetDateTimeValue(jsonInvoice, ManagerCustomField.ReceiptDateGuid) ??
-                    GetDateTimeValue(jsonInvoice, "IssueDate") ??
-                    GetDateTimeValue(jsonInvoice, "Date");
+                ReceiptDate = GetDateTimeValue(jsonInvoice, ManagerCustomField.ReceiptDateGuid);
 
-                var receiptRef = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.ReceiptReferenceGuid);
+                var receiptRef = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.ServerResponseGuid);
                 ReceiptReference = JsonConvert.DeserializeObject<InvoiceReference>(receiptRef);
+
+                //ReceiptID = ReceiptReference.SubmitReceiptResponse.ReceiptID;
             }
 
-            PaymentType1 = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.PaymentType1Guid);
-
-            PaymentType1 = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.PaymentType1Guid);
+            PaymentType1 = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.PaymentType1Guid);
             PaymentAmount1 = GetDoubleValue(jsonInvoice, ManagerCustomField.PaymentAmount1Guid);
-            PaymentType2 = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.PaymentType2Guid);
+
+            PaymentType2 = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.PaymentType2Guid);
             PaymentAmount2 = GetDoubleValue(jsonInvoice, ManagerCustomField.PaymentAmount2Guid);
 
-            BuyerRegisterName = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerRegisterNameGuid);
-            BuyerTradeName = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerTradeNameGuid);
-            BuyerTIN = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerTINGuid);
-            BuyerVatNumber = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerVatNumberGuid);
-            BuyerEmail = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerEmailGuid);
-            BuyerPhoneNo = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerPhoneNoGuid);
-            BuyerProvince = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerProvinceGuid);
-            BuyerCity = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerCityGuid);
-            BuyerStreet = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerStreetGuid);
-            BuyerHouseNo = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.BuyerHouseNoGuid);
+            BuyerRegisterName = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.BuyerRegisterNameGuid, "InvoiceParty");
+            BuyerTradeName = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.BuyerTradeNameGuid, "InvoiceParty");
+            BuyerTIN = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.BuyerTINGuid, "InvoiceParty");
+            BuyerVatNumber = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.BuyerVatNumberGuid, "InvoiceParty");
+            BuyerEmail = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.BuyerEmailGuid, "InvoiceParty");
+            BuyerPhoneNo = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.BuyerPhoneNoGuid, "InvoiceParty");
+            BuyerProvince = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.BuyerProvinceGuid, "InvoiceParty");
+            BuyerCity = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.BuyerCityGuid, "InvoiceParty");
+            BuyerStreet = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.BuyerStreetGuid, "InvoiceParty");
+            BuyerHouseNo = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.BuyerHouseNoGuid, "InvoiceParty");
 
-            ReceiptQrCode = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.ReceiptQRCodeGuid);
-            VerificationCode = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.VerificationCodeGuid);
+            ReceiptQrCode = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.ReceiptQRCodeGuid);
+            VerificationCode = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.VerificationCodeGuid);
 
             ReceiptPrintForm = "InvoiceA4";
 
@@ -158,16 +164,20 @@ namespace ZimraEGS.Models
 
             if (Referrer.Contains("credit-note-view"))
             {
-                ReceiptNotes = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.ReceiptNotesGuid) ?? string.Empty;
+                ReceiptNotes = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.ReceiptNotesGuid) ?? string.Empty;
 
                 DeviceIDRef = GetIntValue(jsonInvoice, ManagerCustomField.DeviceIDGuid, "RefInvoice");
-                DeviceSNRef = RelayDataHelper.FindStringValueInJson(jsonInvoice, ManagerCustomField.DeviceSNGuid, "RefInvoice");
+                DeviceSNRef = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.DeviceSNGuid, "RefInvoice");
                 FiscalDayNoRef = GetIntValue(jsonInvoice, ManagerCustomField.FiscalDayNoGuid, "RefInvoice");
                 ReceiptCounterRef = GetIntValue(jsonInvoice, ManagerCustomField.ReceiptCounterGuid, "RefInvoice");
                 ReceiptGlobalNoRef = GetIntValue(jsonInvoice, ManagerCustomField.ReceiptGlobalNoGuid, "RefInvoice");
 
-                ReceiptRefNo = GetIntValue(jsonInvoice, "Reference", "RefInvoice");
-                ReceiptRefDate = RelayDataHelper.FindStringValueInJson(jsonInvoice, "IssueDate", "RefInvoice");
+                ReceiptRefNo = RelayDataHelper.FindStringValueInJson(jsonInvoice, "Reference", "RefInvoice");
+                ReceiptRefDate = GetDateTimeValue(jsonInvoice, ManagerCustomField.ReceiptDateGuid, "RefInvoice") ?? DateTimeOffset.MinValue;
+
+                var receiptRefRef = RelayDataHelper.GetStringCustomField2Value(jsonInvoice, ManagerCustomField.ServerResponseGuid, "RefInvoice");
+                InvoiceReference ReceiptReferenceRef = JsonConvert.DeserializeObject<InvoiceReference>(receiptRefRef);
+                ReceiptID = ReceiptReferenceRef.SubmitReceiptResponse.ReceiptID;
 
                 ReceiptType = ReceiptType.CreditNote;
 
@@ -185,15 +195,15 @@ namespace ZimraEGS.Models
         }
         private int GetIntValue(string json, string key, string rootKey = null)
         {
-            return int.TryParse(RelayDataHelper.FindStringValueInJson(json, key, rootKey), out int value) ? value : 0;
+            return (int)RelayDataHelper.GetDecimalCustomField2Value(json, key, rootKey);
         }
         private double GetDoubleValue(string json, string key, string rootKey = null)
         {
-            return double.TryParse(RelayDataHelper.FindStringValueInJson(json, key, rootKey), out double value) ? value : 0;
+            return (double)RelayDataHelper.GetDecimalCustomField2Value(json, key, rootKey);
         }
         private DateTimeOffset? GetDateTimeValue(string json, string key, string rootKey = null)
         {
-            return DateTimeOffset.TryParse(RelayDataHelper.FindStringValueInJson(json, key, rootKey), out DateTimeOffset value) ? value : null;
+            return DateTimeOffset.TryParse(RelayDataHelper.GetStringCustomField2Value(json, key, rootKey), out DateTimeOffset value) ? value : null;
         }
 
         public OpenDayViewModel GetOpenDayViewModel()
@@ -238,12 +248,21 @@ namespace ZimraEGS.Models
 
         public ApprovedInvoiceViewModel GetApprovedInvoiceViewModel()
         {
+            DateTimeOffset fiscalDayEnd = BusinessReference.FiscalDayOpened.AddHours(CertificateInfo.TaxPayerDayMaxHrs);
+            TimeSpan timeDifference = DateTimeOffset.Now - fiscalDayEnd;
+            bool TimeForCloseDay = timeDifference.TotalHours < CertificateInfo.TaxpayerDayEndNotificationHrs;
+
             var viewModel = new ApprovedInvoiceViewModel
             {
                 ReceiptReferenceJson = JsonConvert.SerializeObject(ReceiptReference, Formatting.Indented),
                 Referrer = Referrer,
                 ReceiptVerificationCode = VerificationCode,
                 ReceiptQrCode = ReceiptQrCode,
+                Api = Api,
+                Token= Token,
+                BusinessDetailJson= BusinessDetailJson,
+                FiscalDayStatus= DeviceStatus.FiscalDayStatus,
+                TimeForCloseDay = TimeForCloseDay
             };
 
             return viewModel;
@@ -280,7 +299,7 @@ namespace ZimraEGS.Models
             viewModel.ReceiptCounter = Receipt.ReceiptCounter;
 
             viewModel.InvoiceNumber = Receipt.InvoiceNo;
-            viewModel.InvoiceDate = Receipt.ReceiptDate;
+            viewModel.ReceiptDate = Receipt.ReceiptDate;
 
             viewModel.BuyerRegisterName = Receipt.BuyerData.BuyerRegisterName;
 
@@ -325,6 +344,8 @@ namespace ZimraEGS.Models
             DateTimeOffset fiscalDayEnd = BusinessReference.FiscalDayOpened.AddHours(CertificateInfo.TaxPayerDayMaxHrs);
             TimeSpan timeDifference = DateTimeOffset.Now - fiscalDayEnd;
             viewModel.TimeForCloseDay = timeDifference.TotalHours < CertificateInfo.TaxpayerDayEndNotificationHrs;
+
+            viewModel.ReceiptErrors = ReceiptValidator.ValidateReceipt(Receipt, CertificateInfo.ApplicableTaxes);
 
             return viewModel;
 

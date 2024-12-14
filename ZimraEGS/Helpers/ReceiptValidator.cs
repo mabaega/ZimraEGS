@@ -1,87 +1,85 @@
 ﻿using ZimraEGS.ApiClient.Models;
 
-public class ReceiptValidator
+namespace ZimraEGS.Helpers
 {
-    public static List<string> ValidateReceipt(Receipt receipt, DateTime fiscalDayOpened)
+    public class ReceiptValidator
     {
-        List<string> errors = new List<string>();
-
-        // RCPT010: Wrong currency code is used
-        if (receipt.ReceiptCurrency != "ZWG")
+        public static string ValidateReceipt(Receipt receipt, string ApplicableTaxes)
         {
-            errors.Add("RCPT010: Wrong currency code is used");
-        }
+            List<string> errors = new List<string>();
 
-        // RCPT014: Receipt date is earlier than fiscal day opening date
-        if (receipt.ReceiptDate < fiscalDayOpened)
-        {
-            errors.Add("RCPT014: Receipt date is earlier than fiscal day opening date");
-        }
+            var acceptedCurrencyCodes = new List<string> { "ZWG", "USD" };
 
-        // RCPT015: Credited/debited invoice data is not provided
-        // Specific to credit/debit notes, implementation depends on additional context
-
-        // RCPT016: No receipt lines provided
-        if (receipt.ReceiptLines == null || !receipt.ReceiptLines.Any())
-        {
-            errors.Add("RCPT016: No receipt lines provided");
-        }
-
-        // RCPT017: Taxes information is not provided
-        if (receipt.ReceiptTaxes == null || !receipt.ReceiptTaxes.Any())
-        {
-            errors.Add("RCPT017: Taxes information is not provided");
-        }
-
-        // RCPT018: Payment information is not provided
-        if (receipt.ReceiptPayments == null || !receipt.ReceiptPayments.Any())
-        {
-            errors.Add("RCPT018: Payment information is not provided");
-        }
-
-        // RCPT019: Invoice total amount is not equal to sum of all invoice lines
-        double sumInvoiceLines = receipt.ReceiptLines.Sum(line => line.ReceiptLineTotal);
-        if (Math.Abs(sumInvoiceLines - receipt.ReceiptTotal) > 0.01)
-        {
-            errors.Add("RCPT019: Invoice total amount is not equal to sum of all invoice lines");
-        }
-
-        if (string.IsNullOrEmpty(receipt.BuyerData.VatNumber))
-        {
-            errors.Add("RCPT021: VAT tax is used in invoice while taxpayer is not VAT taxpayer");
-        }
-
-        // RCPT022: Invoice sales line price must be greater than 0, etc.
-        //foreach (var line in receipt.ReceiptLines)
-        //{
-        //    if (line.ReceiptLinePrice <= 0)
-        //    {
-        //        errors.Add("RCPT022: Invoice sales line price must be greater than 0");
-        //    }
-        //}
-
-        //// RCPT023: Invoice line quantity must be positive
-        //foreach (var line in receipt.ReceiptLines)
-        //{
-        //    if (line.ReceiptLineQuantity <= 0)
-        //    {
-        //        errors.Add("RCPT023: Invoice line quantity must be positive");
-        //    }
-        //}
-
-        // RCPT025: Invalid tax is used
-        // Specific to tax validation, implementation depends on available tax information
-
-        // RCPT026: Incorrectly calculated tax amount
-        foreach (var tax in receipt.ReceiptTaxes)
-        {
-            var expectedTaxAmount = (tax.TaxPercent.HasValue ? tax.TaxPercent.Value / 100 : 0) * tax.SalesAmountWithTax;
-            if (Math.Abs(tax.TaxAmount - expectedTaxAmount) > 0.01)
+            if (!acceptedCurrencyCodes.Contains(receipt.ReceiptCurrency))
             {
-                errors.Add("RCPT026: Incorrectly calculated tax amount");
+                errors.Add("RCPT010: Wrong currency code is used");
             }
-        }
 
-        return errors;
+            if (receipt.ReceiptLines == null || !receipt.ReceiptLines.Any())
+            {
+                errors.Add("RCPT016: No receipt lines provided");
+            }
+
+            if (receipt.ReceiptTaxes == null || !receipt.ReceiptTaxes.Any())
+            {
+                errors.Add("RCPT017: Taxes information is not provided");
+            }
+            else
+            {
+                //string ApplicableTaxes = "1 - Exempt - #2 - Zero rated 0% - 0#3 - Standard rated 15% - 15#514 - Non-VAT Withholding Tax - 5";
+                var validTaxIDs = ApplicableTaxes.Split('#')
+                    .Select(part => part.Split(' ')[0])
+                    .Where(id => int.TryParse(id, out _))
+                    .Select(int.Parse)
+                    .ToList();
+
+                foreach (var tax in receipt.ReceiptTaxes)
+                {
+                    if (!validTaxIDs.Contains(tax.TaxID))
+                    {
+                        errors.Add("RCPT025: Invalid tax is used");
+                    }
+                }
+            }
+
+            if (receipt.ReceiptPayments == null || !receipt.ReceiptPayments.Any())
+            {
+                errors.Add("RCPT018: Payment information is not provided");
+            }
+            else if (receipt.ReceiptPayments.Sum(x => x.PaymentAmount) != receipt.ReceiptTotal)
+            {
+                errors.Add("RCPT039: Invoice total amount is not equal to sum of all payment amounts");
+            }
+
+            if (receipt.ReceiptType != ApiClient.Enums.ReceiptType.FiscalInvoice)
+            {
+                if (receipt.CreditDebitNote != null)
+                {
+                    // Check if the credited/debited invoice is issued more than 12 months ago
+                    if (receipt.ReceiptDate - receipt.CreditDebitNote.ReceiptRefDate > TimeSpan.FromDays(365))
+                    {
+                        errors.Add("RCPT033: Credited/debited invoice is issued more than 12 months ago");
+                    }
+
+                    // Check if the credit/debit note refers to a non-existing invoice
+                    if (receipt.CreditDebitNote.ReceiptID == 0)
+                    {
+                        errors.Add("RCPT032: Credit / debit note refers to non-existing invoice");
+                    }
+                }
+                else
+                {
+                    // Handle case where the credit/debit note is not provided
+                    errors.Add("RCPT034: Note for credit/debit note is not provided");
+                }
+            }
+
+            if (errors.Count > 0)
+            {
+                return string.Join("\n", errors);
+            }
+
+            return string.Empty;
+        }
     }
 }

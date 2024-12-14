@@ -11,13 +11,13 @@ namespace ZimraEGS.Helpers
             // Combine the lists from the previous and new summaries
             var combinedReceipts = previousSummary.TaxSummaries
                 .Concat(newSummary.TaxSummaries)
-                .GroupBy(r => new { r.FiscalDayNo, r.ReceiptType, r.ReceiptCurrency, r.TaxCode, r.TaxPersen })
+                .GroupBy(r => new { r.FiscalDayNo, r.ReceiptType, r.ReceiptCurrency, r.TaxID, r.TaxPersen })
                 .Select(group => new TaxSummary
                 {
                     FiscalDayNo = group.Key.FiscalDayNo,
                     ReceiptType = group.Key.ReceiptType,
                     ReceiptCurrency = group.Key.ReceiptCurrency,
-                    TaxCode = group.Key.TaxCode,
+                    TaxID = group.Key.TaxID,
                     TaxPersen = group.Key.TaxPersen,
                     TaxAmount = group.Sum(r => r.TaxAmount),
                     SalesAmountWithTax = group.Sum(r => r.SalesAmountWithTax)
@@ -53,13 +53,13 @@ namespace ZimraEGS.Helpers
 
             // Generate Tax Summary
             var taxSummary = receiptData.ReceiptTaxes
-                .GroupBy(t => new { t.TaxCode, t.TaxPersenString })
+                .GroupBy(t => new { t.TaxID, t.TaxPersenString })
                 .Select(group => new TaxSummary
                 {
                     FiscalDayNo = fiscalDayNo,
                     ReceiptType = receiptType,
                     ReceiptCurrency = receiptCurrency,
-                    TaxCode = group.Key.TaxCode,
+                    TaxID = group.Key.TaxID,
                     TaxPersen = group.Key.TaxPersenString,
                     TaxAmount = group.Sum(g => g.TaxAmount),
                     SalesAmountWithTax = group.Sum(g => g.SalesAmountWithTax)
@@ -105,6 +105,7 @@ namespace ZimraEGS.Helpers
                         {
                             FiscalCounterType = FiscalCounterType.SaleByTax,
                             FiscalCounterCurrency = item.ReceiptCurrency,
+                            FiscalCounterTaxID = item.TaxID,
                             FiscalCounterTaxPercent = item.TaxPersen?.ToNullableDouble(),
                             FiscalCounterValue = item.SalesAmountWithTax
                         });
@@ -112,6 +113,7 @@ namespace ZimraEGS.Helpers
                         {
                             FiscalCounterType = FiscalCounterType.SaleTaxByTax,
                             FiscalCounterCurrency = item.ReceiptCurrency,
+                            FiscalCounterTaxID = item.TaxID,
                             FiscalCounterTaxPercent = item.TaxPersen?.ToNullableDouble(),
                             FiscalCounterValue = item.TaxAmount
                         });
@@ -122,6 +124,7 @@ namespace ZimraEGS.Helpers
                         {
                             FiscalCounterType = FiscalCounterType.CreditNoteByTax,
                             FiscalCounterCurrency = item.ReceiptCurrency,
+                            FiscalCounterTaxID = item.TaxID,
                             FiscalCounterTaxPercent = item.TaxPersen?.ToNullableDouble(),
                             FiscalCounterValue = item.SalesAmountWithTax
                         });
@@ -129,6 +132,7 @@ namespace ZimraEGS.Helpers
                         {
                             FiscalCounterType = FiscalCounterType.CreditNoteTaxByTax,
                             FiscalCounterCurrency = item.ReceiptCurrency,
+                            FiscalCounterTaxID = item.TaxID,
                             FiscalCounterTaxPercent = item.TaxPersen?.ToNullableDouble(),
                             FiscalCounterValue = item.TaxAmount
                         });
@@ -139,6 +143,7 @@ namespace ZimraEGS.Helpers
                         {
                             FiscalCounterType = FiscalCounterType.DebitNoteByTax,
                             FiscalCounterCurrency = item.ReceiptCurrency,
+                            FiscalCounterTaxID = item.TaxID,
                             FiscalCounterTaxPercent = item.TaxPersen?.ToNullableDouble(),
                             FiscalCounterValue = item.SalesAmountWithTax
                         });
@@ -146,6 +151,7 @@ namespace ZimraEGS.Helpers
                         {
                             FiscalCounterType = FiscalCounterType.DebitNoteTaxByTax,
                             FiscalCounterCurrency = item.ReceiptCurrency,
+                            FiscalCounterTaxID = item.TaxID,
                             FiscalCounterTaxPercent = item.TaxPersen?.ToNullableDouble(),
                             FiscalCounterValue = item.TaxAmount
                         });
@@ -167,27 +173,33 @@ namespace ZimraEGS.Helpers
                 });
             }
 
-            return ls;
+            return [.. ls.Where(v => v.FiscalCounterValue != 0).
+                OrderBy(t => t.FiscalCounterType).
+                ThenBy(c => c.FiscalCounterCurrency).
+                ThenBy(t => t.FiscalCounterTaxID).
+                ThenBy(m => m.FiscalCounterMoneyType)]; 
         }
         public static string ToHashString(this List<FiscalDayCounter> fiscalDayCounters)
         {
+
             var stringHash = string.Empty;
+
             foreach (var item in fiscalDayCounters)
             {
-                if (item.FiscalCounterType < FiscalCounterType.BalanceByMoneyType)
-                {
-                    stringHash += item.FiscalCounterType.ToString();
-                    stringHash += item.FiscalCounterCurrency;
-                    stringHash += item.FiscalCounterTaxPercent == null ? string.Empty : ((double)item.FiscalCounterTaxPercent).ToString("F2");
-                    stringHash += item.FiscalCounterValue * 100;
-                }
-                else if (item.FiscalCounterType == FiscalCounterType.BalanceByMoneyType)
-                {
-                    stringHash += item.FiscalCounterType.ToString();
-                    stringHash += item.FiscalCounterCurrency;
-                    stringHash += item.FiscalCounterMoneyType;
-                    stringHash += item.FiscalCounterValue * 100;
-                }
+                    if (item.FiscalCounterType < FiscalCounterType.BalanceByMoneyType)
+                    {
+                        stringHash += item.FiscalCounterType.ToString();
+                        stringHash += item.FiscalCounterCurrency;
+                        stringHash += item.FiscalCounterTaxPercent == null ? string.Empty : ((double)item.FiscalCounterTaxPercent).ToString("F2");
+                        stringHash += item.FiscalCounterValue * 100;
+                    }
+                    else if (item.FiscalCounterType == FiscalCounterType.BalanceByMoneyType)
+                    {
+                        stringHash += item.FiscalCounterType.ToString();
+                        stringHash += item.FiscalCounterCurrency;
+                        stringHash += item.FiscalCounterMoneyType;
+                        stringHash += item.FiscalCounterValue * 100;
+                    }
             }
 
             return stringHash.ToUpper();

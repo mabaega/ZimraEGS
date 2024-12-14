@@ -14,6 +14,10 @@
         [Newtonsoft.Json.JsonProperty("fiscalDayNo", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int? FiscalDayNo { get; set; }
 
+        [Newtonsoft.Json.JsonIgnore]
+        [Newtonsoft.Json.JsonProperty("ReceiptRefDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public DateTimeOffset ReceiptRefDate { get; set; }
+
     }
 
 }

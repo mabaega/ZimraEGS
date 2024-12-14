@@ -13,7 +13,7 @@ namespace ZimraEGS.Models
         public int FiscalDayNo { get; set; } = 0;
         public ReceiptType ReceiptType { get; set; }
         public string ReceiptCurrency { get; set; } = "ZWG";
-        public string TaxCode { get; set; } = string.Empty;
+        public int TaxID { get; set; }
         public string? TaxPersen { get; set; }
         public Double TaxAmount { get; set; } = 0;
         public Double SalesAmountWithTax { get; set; } = 0;

@@ -1,31 +1,32 @@
 {
-  "credit-note-footer-form": [
-    {
-      "Content": "<script src=\"resources/qrcode/qrcode.js\"></script>",
-      "Key": "29fd5925-5e6c-4c3b-99dc-2d64b07abade",
-      "Name": "QRCode"
-    }
-  ],
   "number-custom-field-form": [
     {
-      "DisplayOnView": true,
-      "Key": "d08c8744-486f-470d-82d1-29b1a1cb06ae",
-      "Name": "Device ID",
+      "Key": "e2ab11ef-73e2-4ea4-802f-55b8c834037d",
+      "Name": "Payment Amount 1",
       "Placement": [
         "ad12b60b-23bf-4421-94df-8be79cef533e",
         "245e5943-0092-409d-96ae-e2ee10eac75b"
       ],
-      "Position": 40
+      "Position": 30
+    },
+    {
+      "Key": "f3a2f5dd-8da8-4701-b8d5-be5877792a79",
+      "Name": "Payment Amount 2",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 50
     },
     {
       "DisplayOnView": true,
-      "Key": "a9867045-740b-493f-8b67-43b6da07e41e",
-      "Name": "ReceiptCounter",
+      "Key": "d08c8744-486f-470d-82d1-29b1a1cb06ae",
+      "Name": "DeviceID",
       "Placement": [
         "ad12b60b-23bf-4421-94df-8be79cef533e",
         "245e5943-0092-409d-96ae-e2ee10eac75b"
       ],
-      "Position": 44
+      "Position": 70
     },
     {
       "DisplayOnView": true,
@@ -35,178 +36,81 @@
         "ad12b60b-23bf-4421-94df-8be79cef533e",
         "245e5943-0092-409d-96ae-e2ee10eac75b"
       ],
-      "Position": 42
-    },
-    {
-      "DisplayOnView": true,
-      "Key": "ff05ca33-3dae-4b97-90ee-73901c7a51d7",
-      "Name": "ReceiptRefNo",
-      "Placement": [
-        "245e5943-0092-409d-96ae-e2ee10eac75b"
-      ],
-      "Position": 49
+      "Position": 72
     },
     {
       "DisplayOnView": true,
       "Key": "4712e5df-c5e3-4b6e-9746-8ebb58a81dee",
-      "Name": "ReceiptGlobalNo",
+      "Name": "Receipt GlobalNo",
       "Placement": [
         "ad12b60b-23bf-4421-94df-8be79cef533e",
         "245e5943-0092-409d-96ae-e2ee10eac75b"
       ],
-      "Position": 43
+      "Position": 73
     },
     {
       "DisplayOnView": true,
-      "Key": "980cd617-4173-4b1a-b310-f8fe36ceed52",
-      "Name": "ReceiptGlobalNoRef",
-      "Placement": [
-        "245e5943-0092-409d-96ae-e2ee10eac75b"
-      ],
-      "Position": 48
-    },
-    {
-      "DisplayOnView": true,
-      "Key": "de2ba4f5-baa3-45b7-86d4-716fb923557e",
-      "Name": "ReceiptCounterRef",
-      "Placement": [
-        "245e5943-0092-409d-96ae-e2ee10eac75b"
-      ],
-      "Position": 47
-    },
-    {
-      "DisplayOnView": true,
-      "Key": "770e9cdb-9f55-497a-923a-f8cef6b93595",
-      "Name": "FiscalDayNoRef",
-      "Placement": [
-        "245e5943-0092-409d-96ae-e2ee10eac75b"
-      ],
-      "Position": 46
-    },
-    {
-      "Key": "f3a2f5dd-8da8-4701-b8d5-be5877792a79",
-      "Name": "Amount 2",
+      "Key": "a9867045-740b-493f-8b67-43b6da07e41e",
+      "Name": "Receipt Counter",
       "Placement": [
         "ad12b60b-23bf-4421-94df-8be79cef533e",
         "245e5943-0092-409d-96ae-e2ee10eac75b"
       ],
-      "Position": 28
+      "Position": 74
     },
     {
-      "Key": "e2ab11ef-73e2-4ea4-802f-55b8c834037d",
-      "Name": "Amount 1",
+      "DisplayOnView": true,
+      "Key": "d08c8744-486f-470d-82d1-29b1a1cb06af",
+      "Name": "DeviceID Ref",
       "Placement": [
         "ad12b60b-23bf-4421-94df-8be79cef533e",
         "245e5943-0092-409d-96ae-e2ee10eac75b"
       ],
-      "Position": 26
-    }
-  ],
-  "sales-invoice-footer-form": [
-    {
-      "Content": "<script src=\"resources/qrcode/qrcode.js\"></script>",
-      "Key": "8a7cf08c-58a1-408d-9ef6-1ed9fa621638",
-      "Name": "QRCode"
-    }
-  ],
-  "tax-code-form": [
-    {
-      "Key": "51285cd8-0cfb-402c-9a3b-b1775cd16ce6",
-      "Label": "Non-VAT WHT",
-      "Name": "Non-VAT Withholding Tax — 514",
-      "Rate": 5,
-      "TaxRate": "CustomRate",
-      "Type": "SingleRate"
+      "Position": 82
     },
     {
-      "Key": "d45ffe42-182a-4920-a5c6-dd2fd983794a",
-      "Label": "15% VAT",
-      "Name": "Standard rated 15%) — 3",
-      "Rate": 15,
-      "TaxRate": "CustomRate",
-      "Type": "SingleRate"
+      "DisplayOnView": true,
+      "Key": "4712e5df-c5e3-4b6e-9746-8ebb58a81def",
+      "Name": "Receipt GlobalNoRef",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 84
     },
     {
-      "Key": "693aa908-e2ae-4a4a-997f-b23cc056d7fd",
-      "Label": "0% VAT",
-      "Name": "Zero rated 0% — 2",
-      "Rate": 0.0,
-      "TaxRate": "CustomRate",
-      "Type": "SingleRate"
+      "DisplayOnView": true,
+      "Key": "c6e40e7a-974e-4ffc-9c76-1c1ecfd05694",
+      "Name": "FiscalDayNo Ref",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 85
     },
     {
-      "Key": "6d0a93d1-a251-4509-94d2-9c1b2ade93b3",
-      "Label": "VAT (Exempt)",
-      "Name": "Exempt — 1",
-      "Rate": 0.0,
-      "TaxRate": "CustomRate",
-      "Type": "SingleRate"
+      "DisplayOnView": true,
+      "Key": "a9867045-740b-493f-8b67-43b6da07e41f",
+      "Name": "Receipt CounterRef",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 86
     }
   ],
   "text-custom-field-form": [
     {
-      "DisplayOnView": true,
-      "Key": "fc6f05f9-50c7-46c0-b9f5-7fe0ca83cf2a",
-      "Name": "Approval Status",
+      "Key": "329de867-9cf1-4dfe-8b06-5084bce788c7",
+      "Name": "HS Code",
       "Placement": [
-        "ad12b60b-23bf-4421-94df-8be79cef533e",
-        "245e5943-0092-409d-96ae-e2ee10eac75b"
+        "0dbdbf8a-d80c-48e6-b453-bb7862445b7c",
+        "7affe9ee-731f-4936-8acf-15cae7bcacee",
+        "efc4f2cc-acf0-4815-a9a8-13bae00c6167",
+        "c37e4421-591a-4440-90ef-c5c9421e7948",
+        "4f819a77-dabc-4e28-8c99-172a1f595f3f"
       ],
-      "Position": 39,
-      "Size": "Medium"
-    },
-    {
-      "DisplayOnView": true,
-      "Key": "a0454495-cae8-43ef-a418-4dad69427e78",
-      "Name": "Verification Code",
-      "Placement": [
-        "ad12b60b-23bf-4421-94df-8be79cef533e",
-        "245e5943-0092-409d-96ae-e2ee10eac75b"
-      ],
-      "Position": 38,
-      "Size": "Medium"
-    },
-    {
-      "DisplayOnView": true,
-      "Key": "a360538c-ebe9-49e9-8cf8-fccd51320380",
-      "Name": "Device SN",
-      "Placement": [
-        "ad12b60b-23bf-4421-94df-8be79cef533e",
-        "245e5943-0092-409d-96ae-e2ee10eac75b"
-      ],
-      "Position": 41
-    },
-    {
-      "DisplayOnView": true,
-      "Key": "cf2ccb83-64ae-4cbb-9fab-b774bdf83c95",
-      "Name": "ReceiptRefDate",
-      "Placement": [
-        "245e5943-0092-409d-96ae-e2ee10eac75b"
-      ],
-      "Position": 50
-    },
-    {
-      "DisplayOnView": true,
-      "Key": "39b3d219-a386-4d9f-b3a0-55968b4bc7b7",
-      "Name": "Receipt Date",
-      "Placement": [
-        "ad12b60b-23bf-4421-94df-8be79cef533e",
-        "245e5943-0092-409d-96ae-e2ee10eac75b"
-      ],
-      "Position": 99,
-      "Size": "Medium"
-    },
-    {
-      "Key": "75190339-992a-4fb0-bf79-f5f8226edb4b",
-      "Name": "Receipt Reference",
-      "Description": "<script>\ndocument.addEventListener('DOMContentLoaded', function () {\n    const MakeHidden = labels => updateFields(labels, 'hide');\n\tconst MakeReadonly = labels => updateFields(labels, 'readonly');\n\tconst MakeReadonlyAndHide = labels => updateFields(labels, 'readonlyandhide');\n\tfunction updateFields(labels, action) {\n\t\tconst customFieldset = [...document.querySelectorAll('fieldset')].find(fieldset => fieldset.querySelector('legend')?.textContent.trim() === 'Custom Fields');\n\t\tif (!customFieldset) return console.error('Custom Fields fieldset not found');\n\t\tcustomFieldset.querySelectorAll('.form-group').forEach(group => {\n\t\t\tconst label = group.querySelector('label'), input = group.querySelector('input, textarea'), dropdown = group.querySelector('.vs__dropdown-toggle');\n\t\t\tif (label && labels.includes(label.textContent.trim())) {\n\t\t\t\tif (action === 'hide') group.style.display = 'none';\n\t\t\t\telse if (action === 'readonly' && input) input.setAttribute('readonly', 'true');\n\t\t\t\telse if (action === 'readonlyandhide') { if (input) input.setAttribute('readonly', 'true'); group.style.display = 'none'; }\n\t\t\t\tif (dropdown) {\n\t\t\t\t\tconst searchInput = dropdown.querySelector('input.vs__search'), clearButton = dropdown.querySelector('.vs__clear');\n\t\t\t\t\tif (action === 'readonly' || action === 'readonlyandhide') {\n\t\t\t\t\t\tdropdown.setAttribute('disabled', 'true');\n\t\t\t\t\t\tif (searchInput) searchInput.setAttribute('readonly', 'true');\n\t\t\t\t\t\tif (clearButton) clearButton.style.display = 'none';\n\t\t\t\t\t\tdropdown.style.pointerEvents = 'none';\n\t\t\t\t\t}\n\t\t\t\t\tif (action === 'hide' || action === 'readonlyandhide') dropdown.style.pointerEvents = 'none';\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t}\n    MakeReadonly(['Receipt QRCode', 'Verification Code', 'Approval Status', 'Receipt Reference']);\n    MakeReadonlyAndHide(['Device ID', 'Device SN','ReceiptCounter','ReceiptGlobalNo','FiscalDayNo']);\n});\n</script>",
-      "Placement": [
-        "ad12b60b-23bf-4421-94df-8be79cef533e",
-        "245e5943-0092-409d-96ae-e2ee10eac75b"
-      ],
-      "Position": 100,
-      "Size": "Large",
-      "Type": "ParagraphText"
+      "Position": 0
     },
     {
       "Key": "f7214db4-6726-4aa9-b5cd-3ff90ce9ba6c",
@@ -220,11 +124,11 @@
     },
     {
       "Key": "0f0bf167-4b63-493d-ab45-049a76a07f46",
-      "Name": "FiscalDaySummary",
+      "Name": "FiscalDay Summary",
       "Placement": [
         "38cf4712-6e95-4ce1-b53a-bff03edad273"
       ],
-      "Position": 44,
+      "Position": 2,
       "Size": "Large",
       "Type": "ParagraphText"
     },
@@ -232,24 +136,33 @@
       "DisplayOnView": true,
       "Key": "6a347c55-735a-4a38-8cf6-0db93dce2ded",
       "Name": "Certificate Info",
+      "Description": "<script>\ndocument.addEventListener('DOMContentLoaded', function () {\n    const addressTextarea = Array.from(document.querySelectorAll('.form-group')).find(group => group.querySelector('label')?.textContent.trim() === 'Address')?.querySelector('textarea'); \n    if (addressTextarea) addressTextarea.setAttribute('readonly', 'true');\n    const customFieldsGroup = Array.from(document.querySelectorAll('fieldset')).find(fieldset => fieldset.querySelector('legend')?.textContent.trim() === 'Custom Fields'); \n    if (customFieldsGroup) ['Business Reference', 'FiscalDay Summary', 'Certificate Info', 'EGS Version'].forEach(label => Array.from(customFieldsGroup.querySelectorAll('.form-group')).find(group => group.querySelector('label')?.textContent.trim() === label)?.querySelector('textarea, input')?.setAttribute('readonly', 'true'));\n});\n</script>",
       "Placement": [
         "38cf4712-6e95-4ce1-b53a-bff03edad273"
       ],
-      "Position": 10,
+      "Position": 3,
       "Size": "Large",
       "Type": "ParagraphText"
     },
     {
-      "Key": "329de867-9cf1-4dfe-8b06-5084bce788c7",
-      "Name": "HSCode",
+      "DisplayOnView": true,
+      "Key": "329de867-9cf1-4dfe-8b06-5084bce788c8",
+      "Name": "EGS Version",
       "Placement": [
-        "0dbdbf8a-d80c-48e6-b453-bb7862445b7c",
-        "7affe9ee-731f-4936-8acf-15cae7bcacee",
-        "efc4f2cc-acf0-4815-a9a8-13bae00c6167",
-        "c37e4421-591a-4440-90ef-c5c9421e7948",
-        "4f819a77-dabc-4e28-8c99-172a1f595f3f"
+        "38cf4712-6e95-4ce1-b53a-bff03edad273"
       ],
-      "Position": 0
+      "Position": 4,
+      "Size": "Small"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "c7e511ba-6e9e-48ad-a61c-084e7d0f38ad",
+      "Name": "Receipt Notes",
+      "Placement": [
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 10,
+      "Size": "Medium"
     },
     {
       "Key": "5b3ebf5f-ad4f-4ffc-84d1-abda67a7d294",
@@ -259,7 +172,7 @@
         "ad12b60b-23bf-4421-94df-8be79cef533e",
         "245e5943-0092-409d-96ae-e2ee10eac75b"
       ],
-      "Position": 25,
+      "Position": 20,
       "Size": "Medium",
       "Type": "DropdownList"
     },
@@ -271,9 +184,84 @@
         "ad12b60b-23bf-4421-94df-8be79cef533e",
         "245e5943-0092-409d-96ae-e2ee10eac75b"
       ],
-      "Position": 27,
+      "Position": 40,
       "Size": "Medium",
       "Type": "DropdownList"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "39b3d219-a386-4d9f-b3a0-55968b4bc7b7",
+      "Name": "Receipt Date",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 60,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "a360538c-ebe9-49e9-8cf8-fccd51320380",
+      "Name": "DeviceSN",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 71
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "c7e511ba-6e9e-48ad-a61c-084e7d0f38ac",
+      "Name": "Receipt NoRef",
+      "Placement": [
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 80,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "39b3d219-a386-4d9f-b3a0-55968b4bc7b8",
+      "Name": "Receipt DateRef",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 81,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "a360538c-ebe9-49e9-8cf8-fccd51320381",
+      "Name": "DeviceSN Ref",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 83
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "fc6f05f9-50c7-46c0-b9f5-7fe0ca83cf2a",
+      "Description": "<div id='cfActions'><script>\ndocument.addEventListener('DOMContentLoaded', function () {\n    const customFields = [\n\t\t{ label: 'Payment Type 1', actions: ['clear'] },\n\t\t{ label: 'Payment Amount 1', actions: ['clear'] },\n\t\t{ label: 'Payment Type 2', actions: ['clear'] },\n\t\t{ label: 'Payment Amount 2', actions: ['clear'] },\n\t\t{ label: 'Receipt Date', actions: ['readonly', 'clear'] },\n\t\t{ label: 'DeviceID', actions: ['readonly', 'hide', 'clear'] },\n\t\t{ label: 'DeviceSN', actions: ['readonly', 'hide', 'clear'] },\n\t\t{ label: 'FiscalDayNo', actions: ['readonly', 'hide', 'clear'] },\n\t\t{ label: 'Receipt GlobalNo', actions: ['readonly', 'hide', 'clear'] },\n\t\t{ label: 'Receipt Counter', actions: ['readonly', 'hide', 'clear'] },\n\t\t{ label: 'Receipt NoRef', actions: ['readonly', 'hide', 'clear'] },\n\t\t{ label: 'Receipt Notes', actions: ['clear'] },\n\t\t{ label: 'Receipt DateRef', actions: ['readonly', 'hide', 'clear'] },\n\t\t{ label: 'DeviceID Ref', actions: ['readonly', 'hide', 'clear'] },\n\t\t{ label: 'DeviceSN Ref', actions: ['readonly', 'hide', 'clear'] },\n\t\t{ label: 'FiscalDayNo Ref', actions: ['readonly', 'hide', 'clear'] },\n\t\t{ label: 'Receipt CounterRef', actions: ['readonly', 'hide', 'clear'] },\n\t\t{ label: 'Receipt GlobalNoRef', actions: ['readonly', 'hide', 'clear'] },\n\t\t{ label: 'Approval Status', actions: ['readonly', 'clear'] },\n\t\t{ label: 'Receipt QRCode', actions: ['readonly', 'clear'] },\n\t\t{ label: 'Verification Code', actions: ['readonly', 'hide', 'clear'] },\n\t\t{ label: 'Server Response', actions: ['readonly', 'clear'] },\n\t];\n\n    const isUpdate = document.querySelector('button.btn.btn-success[onclick=\"ajaxPost(true)\"]') !== null;\n\n    if (!isUpdate) {\n\t\tif (app && app.CustomFields2) {\n\t\t\tif (app.CustomFields2.Strings) {\n\t\t\t\tfor (let guid in app.CustomFields2.Strings) {\n\t\t\t\t\tif (app.CustomFields2.Strings.hasOwnProperty(guid)) {\n\t\t\t\t\t\tdelete app.CustomFields2.Strings[guid];\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t\tif (app.CustomFields2.Decimals) {\n\t\t\t\tfor (let guid in app.CustomFields2.Decimals) {\n\t\t\t\t\tif (app.CustomFields2.Decimals.hasOwnProperty(guid)) {\n\t\t\t\t\t\tdelete app.CustomFields2.Decimals[guid];\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\n    const disableDateAndReference = () => {\n        const dateInput = document.querySelector('.mx-input');\n        if (dateInput) {\n            dateInput.disabled = true;\n            const calendarIcon = document.querySelector('.mx-icon-calendar');\n            if (calendarIcon) {\n                calendarIcon.style.pointerEvents = 'none';\n                calendarIcon.style.opacity = '0.5';\n            }\n        }\n\n        const checkbox = document.querySelector('.input-group-addon input[type=\"checkbox\"]');\n        const inputText = document.querySelector('.input-group input[type=\"text\"]');\n        if (checkbox && inputText) {\n            try {\n                if (typeof app !== 'undefined') {\n                    app.AutomaticReference = false;\n                }\n                checkbox.checked = false;\n                checkbox.disabled = true;\n                inputText.disabled = true;\n            } catch (error) {}\n        }\n    };\n\n    const processCustomFields = () => {\n        const customFieldsFieldset = [...document.querySelectorAll('fieldset')]\n            .find(fieldset => fieldset.querySelector('legend')?.textContent.trim() === 'Custom Fields');\n        \n        if (!customFieldsFieldset) return;\n\n        customFields.forEach(field => {\n            let customField = null;\n            customField = Array.from(customFieldsFieldset.querySelectorAll('.form-group'))\n                .find(group => group.querySelector('label')?.textContent.trim() === field.label);\n\n            if (!customField) return;\n\n            const input = customField.querySelector('input, textarea');\n            const dropdown = customField.querySelector('.vs__dropdown-toggle');\n\n            if (field.actions.includes('hide')) {\n                customField.style.display = 'none';\n            }\n\n            if (field.actions.includes('readonly')) {\n                if (input) {\n                    input.setAttribute('readonly', 'true');\n                }\n                if (dropdown) {\n                    const searchInput = dropdown.querySelector('input.vs__search');\n                    const clearButton = dropdown.querySelector('.vs__clear');\n                    dropdown.setAttribute('disabled', 'true');\n                    if (searchInput) searchInput.setAttribute('readonly', 'true');\n                    if (clearButton) clearButton.style.display = 'none';\n                    dropdown.style.pointerEvents = 'none';\n                }\n            }\n\n            if (!isUpdate && field.actions.includes('clear')) {\n                if (input) {\n                    input.value = '';\n                }\n                if (dropdown) {\n                    const searchInput = dropdown.querySelector('input.vs__search');\n                    if (searchInput) searchInput.value = '';\n                }\n            }\n        });\n    };\n\n    const disableUpdateButtonIfApproved = () => {\n        const approvalField = customFields.find(field => field.label === 'Approval Status');\n        if (!approvalField) return;\n\n        const customFieldsFieldset = [...document.querySelectorAll('fieldset')]\n            .find(fieldset => fieldset.querySelector('legend')?.textContent.trim() === 'Custom Fields');\n        \n        if (!customFieldsFieldset) return;\n\n        const customField = Array.from(customFieldsFieldset.querySelectorAll('.form-group'))\n            .find(group => group.querySelector('label')?.textContent.trim() === 'Approval Status');\n\n        if (!customField) return;\n\n        const input = customField.querySelector('input, textarea');\n\n        if (input && input.value.trim() === 'APPROVED' && isUpdate) {\n            const updateButton = document.querySelector('button.btn.btn-success[onclick=\"ajaxPost(true)\"]');\n            if (updateButton) {\n                updateButton.disabled = true;\n            }\n        }\n    };\n\n    try {\n        disableDateAndReference();\n        processCustomFields();\n        disableUpdateButtonIfApproved();\n    } catch (error) {}\n\n    const selfDeletingContainer = document.getElementById('cfActions'); \n    if (selfDeletingContainer) { \n        selfDeletingContainer.remove();\n    }\n});\n</script></div>",
+      "Name": "Approval Status",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 90,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "a0454495-cae8-43ef-a418-4dad69427e78",
+      "Name": "Verification Code",
+      "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
+        "245e5943-0092-409d-96ae-e2ee10eac75b"
+      ],
+      "Position": 91,
+      "Size": "Medium"
     },
     {
       "DisplayOnView": true,
@@ -283,36 +271,66 @@
         "ad12b60b-23bf-4421-94df-8be79cef533e",
         "245e5943-0092-409d-96ae-e2ee10eac75b"
       ],
-      "Position": 30,
+      "Position": 92,
       "Size": "Medium"
     },
     {
-      "DisplayOnView": true,
-      "Key": "c7e511ba-6e9e-48ad-a61c-084e7d0f38ad",
-      "Name": "Receipt Notes",
+      "Key": "75190339-992a-4fb0-bf79-f5f8226edb4b",
+      "Name": "Server Response",
       "Placement": [
+        "ad12b60b-23bf-4421-94df-8be79cef533e",
         "245e5943-0092-409d-96ae-e2ee10eac75b"
       ],
-      "Position": 24,
+      "Position": 100,
+      "Size": "Large",
+      "Type": "ParagraphText"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "d554566a-188b-4c5c-abec-86e1f18eee78",
+      "Name": "Buyer Register Name",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 110,
       "Size": "Medium"
     },
     {
       "DisplayOnView": true,
-      "Key": "568a19c2-bc66-4dc2-8bbd-de0768e7e283",
-      "Name": "Buyer House No",
+      "Key": "c8def7d7-8d4d-487c-9685-ab0693dccd1f",
+      "Name": "Buyer Trade Name",
       "Placement": [
         "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
       ],
-      "Position": 117
+      "Position": 111,
+      "Size": "Medium"
     },
     {
       "DisplayOnView": true,
-      "Key": "62e8d3ee-bf4d-4b3e-956f-870ed4d99a90",
-      "Name": "Buyer Street",
+      "Key": "af771746-d00a-4f78-906c-8946098e1184",
+      "Name": "Buyer TIN",
       "Placement": [
         "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
       ],
-      "Position": 116,
+      "Position": 112
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "2a0e1d10-e66b-4b12-9b9c-3b3f3b7c35f9",
+      "Name": "Buyer Vat Number",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 113
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "aec2c1f7-3aed-49fd-82d8-c15a7b69a74f",
+      "Name": "Buyer Province",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 114,
       "Size": "Medium"
     },
     {
@@ -327,12 +345,31 @@
     },
     {
       "DisplayOnView": true,
-      "Key": "aec2c1f7-3aed-49fd-82d8-c15a7b69a74f",
-      "Name": "Buyer Province",
+      "Key": "62e8d3ee-bf4d-4b3e-956f-870ed4d99a90",
+      "Name": "Buyer Street",
       "Placement": [
         "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
       ],
-      "Position": 114,
+      "Position": 116,
+      "Size": "Medium"
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "568a19c2-bc66-4dc2-8bbd-de0768e7e283",
+      "Name": "Buyer House No",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 117
+    },
+    {
+      "DisplayOnView": true,
+      "Key": "5b2a8521-9e28-4edf-ac2c-527562349188",
+      "Name": "Buyer Email",
+      "Placement": [
+        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
+      ],
+      "Position": 118,
       "Size": "Medium"
     },
     {
@@ -342,63 +379,49 @@
       "Placement": [
         "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
       ],
-      "Position": 120,
-      "Size": "Medium"
-    },
-    {
-      "DisplayOnView": true,
-      "Key": "5b2a8521-9e28-4edf-ac2c-527562349188",
-      "Name": "Buyer Email",
-      "Placement": [
-        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
-      ],
       "Position": 119,
       "Size": "Medium"
+    }
+  ],
+  "tax-code-form": [
+    {
+      "Key": "6d0a93d1-a251-4509-94d2-9c1b2ade93b3",
+      "Label": "VAT (Exempt)",
+      "Name": "Exempt — 1",
+      "Rate": 0.0,
+      "TaxRate": "CustomRate",
+      "Type": "SingleRate"
     },
     {
-      "DisplayOnView": true,
-      "Key": "2a0e1d10-e66b-4b12-9b9c-3b3f3b7c35f9",
-      "Name": "Buyer Vat Number",
-      "Placement": [
-        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
-      ],
-      "Position": 113
+      "Key": "693aa908-e2ae-4a4a-997f-b23cc056d7fd",
+      "Label": "0% VAT",
+      "Name": "Zero rated 0% — 2",
+      "Rate": 0.0,
+      "TaxRate": "CustomRate",
+      "Type": "SingleRate"
     },
     {
-      "DisplayOnView": true,
-      "Key": "af771746-d00a-4f78-906c-8946098e1184",
-      "Name": "Buyer TIN",
-      "Placement": [
-        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
-      ],
-      "Position": 112
+      "Key": "d45ffe42-182a-4920-a5c6-dd2fd983794a",
+      "Label": "15% VAT",
+      "Name": "Standard rated 15%) — 3",
+      "Rate": 15,
+      "TaxRate": "CustomRate",
+      "Type": "SingleRate"
     },
     {
-      "DisplayOnView": true,
-      "Key": "c8def7d7-8d4d-487c-9685-ab0693dccd1f",
-      "Name": "Buyer Trade Name",
-      "Placement": [
-        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
-      ],
-      "Position": 111,
-      "Size": "Medium"
-    },
-    {
-      "DisplayOnView": true,
-      "Key": "d554566a-188b-4c5c-abec-86e1f18eee78",
-      "Name": "Buyer Register Name",
-      "Placement": [
-        "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee"
-      ],
-      "Position": 110,
-      "Size": "Medium"
+      "Key": "51285cd8-0cfb-402c-9a3b-b1775cd16ce6",
+      "Label": "Non-VAT WHT",
+      "Name": "Non-VAT Withholding Tax — 514",
+      "Rate": 5,
+      "TaxRate": "CustomRate",
+      "Type": "SingleRate"
     }
   ],
   "inventory-item-form": [
     {
       "Key": "8335fc1b-176a-4dc6-be5b-a516dcf65bfe",
       "ItemName": "Item Exempt",
-      "UnitName": "Pce",
+      "UnitName": "PCE",
       "ValuationMethod": "WeightedAverageCost",
       "HasDefaultLineDescription": true,
       "DefaultLineDescription": "Item with VAT Exempt",
@@ -468,10 +491,14 @@
         "Strings": {
           "c8def7d7-8d4d-487c-9685-ab0693dccd1f": "Food Market ABC",
           "d554566a-188b-4c5c-abec-86e1f18eee78": "Company ABC, Ltd.",
-          "af771746-d00a-4f78-906c-8946098e1184": "19870123",
-          "5b2a8521-9e28-4edf-ac2c-527562349188": "john.smith@email.com",
-          "2e909259-6785-419a-aaef-6390a427b5f6": "(081) 20875",
-          "aec2c1f7-3aed-49fd-82d8-c15a7b69a74f": "12 Southgate Hwange"
+          "af771746-d00a-4f78-906c-8946098e1184": "1987012390",
+          "5b2a8521-9e28-4edf-ac2c-527562349188": "smith.john@email.com",
+          "2e909259-6785-419a-aaef-6390a427b5f6": "(001) 20875",
+          "aec2c1f7-3aed-49fd-82d8-c15a7b69a74f": "12 Southgate Hwange",
+          "2a0e1d10-e66b-4b12-9b9c-3b3f3b7c35f9": "198701230",
+          "5fc8a9b9-efef-45d0-94da-1b0438e75725": "Buyer City",
+          "568a19c2-bc66-4dc2-8bbd-de0768e7e283": "4321",
+          "62e8d3ee-bf4d-4b3e-956f-870ed4d99a90": "Buyer Street"
         }
       }
     }
@@ -481,6 +508,14 @@
       "Key": "849a16a6-0359-47b7-b506-8e35e239c582",
       "Code": "USD",
       "Symbol": "USD"
+    }
+  ],
+  "theme-form": [
+    {
+      "Key": "f43edcbb-2448-4890-bbd2-18f87fdbad13",
+      "Name": "ZimTheme",
+      "Template": "{% assign SNIdx = nil %}\r\n{% assign itemIdx = nil %}\r\n{% assign descriptionIdx = nil %}\r\n{% assign qtyIdx = nil %}\r\n{% assign unitPriceIdx = nil %}\r\n{% assign priceIdx = nil %}\r\n{% assign discountIdx = nil %}\r\n{% assign amountIdx = nil %}\r\n{% assign taxIdx = nil %}\r\n{% assign taxAmountIdx = nil %}\r\n{% assign totalIdx = nil %}\r\n{% for column in table.columns %}\r\n    {% if column.label == '#' %}\r\n        {% assign SNIdx = forloop.index0 %}\r\n    {% elsif column.label == 'Item' %}\r\n        {% assign itemIdx = forloop.index0 %}\r\n    {% elsif column.label == 'Description' %}\r\n        {% assign descriptionIdx = forloop.index0 %}\r\n    {% elsif column.label == 'Unit price' %}\r\n        {% assign unitPriceIdx = forloop.index0 %}\r\n        {% assign qtyIdx = forloop.index0 | minus: 1 %}\r\n    {% elsif column.label == 'Price' %}\r\n        {% assign priceIdx = forloop.index0 %}\r\n    {% elsif column.label == 'Discount' %}\r\n        {% assign discountIdx = forloop.index0 %}\r\n    {% elsif column.label == 'Amount' %}\r\n        {% assign amountIdx = forloop.index0 %}\r\n    {% elsif column.label == 'Tax' %}\r\n        {% assign taxIdx = forloop.index0 %}\r\n    {% elsif column.label == 'Tax Amount' %}\r\n        {% assign taxAmountIdx = forloop.index0 %}\r\n    {% elsif column.label == 'Total' %}\r\n        {% assign totalIdx = forloop.index0 %}\r\n    {% endif %}\r\n{% endfor %}\r\n{% assign full_url = custom_fields['Receipt QRCode'] %}\r\n{% if full_url | contains: '/' %}\r\n    {% assign url_parts = full_url | split: '/' %}\r\n    {% assign base_url = url_parts[0] | append: '//' | append: url_parts[1] %}\r\n{% endif %}\r\n<table style='width: 100%; padding: 20px; font-family: Arial, sans-serif;'>\r\n    <tr>\r\n        <td colspan='3' style='padding-bottom: 10px;'>\r\n            <table style='width: 100%;'>\r\n                <tr>\r\n                    <td style='width: 280px; vertical-align: top;'>\r\n                        <div>\r\n                            <img src='{{ business.logo }}' style='width: 100px;' />\r\n                        </div>\r\n                        <h1 style='margin: 0; font-size: 24px; text-align: left; padding: 0px; color: black; text-shadow: 2px 2px 4px #aaa;'>{{ title }}</h1>\r\n                    </td>\r\n                    <td style='text-align: right; padding-right: 20px; vertical-align: top;'>\r\n                        <div style='font-size: 12px; margin-top: 20px;'>\r\n                            Verification code<br/>\r\n                            {{ custom_fields['Verification Code'] }}\r\n                        </div>\r\n                        <div style='font-size: 12px; margin-top: 10px;'>\r\n                            Verify this receipt manually at<br/>\r\n                            <a href='{{ full_url }}' target='_blank'>{{ base_url }}</a>\r\n                        </div>\r\n                    </td>\r\n                    <td style='width: 96px; vertical-align: top;'>\r\n                        <div style='font-size: 12px;'> </div>\r\n                        <div style='width: 94px; height: 94px; border: 1px solid #dddddd; display: flex; justify-content: center; align-items: center;'>\r\n                            <div id='zimraqrcode' style='width: 80px; height: 80px; text-align: center'>{{ custom_fields['Approval Status'] }}</div>\r\n                        </div>\r\n                        {% assign isApproved = custom_fields['Approval Status'] %}\r\n                        {% if isApproved == 'APPROVED' %}\r\n                        <script src='resources/qrcode/qrcode.js'></script>\r\n                        <script>\r\n                            const qrCodeElement = document.getElementById('zimraqrcode');\r\n                            if (qrCodeElement) {\r\n                                const qrCodeText = '{{ full_url }}'; \r\n                                qrCodeElement.innerHTML = '';\r\n                                new QRCode(qrCodeElement, {text: qrCodeText, width: 80, height: 80, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.L});\r\n                            } \r\n                        </script>\r\n                        {% endif %}\r\n                    </td>\r\n                </tr>\r\n            </table>\r\n        </td>\r\n    </tr>\r\n    <tr>\r\n        <td style='width: 50%; padding: 8px; vertical-align: top;'>\r\n            {{ business.address }}\r\n        </td>\r\n        <td style='width: 50%; padding: 8px; vertical-align: top;'><div>\r\n            <div style='font-weight: bold; color: black; text-shadow: 2px 2px 4px #aaa;'>BUYER</div>\r\n            <div style='font-weight: bold;'>{{ custom_fields['Buyer Register Name'] }}</div>\r\n            <div>{{ custom_fields['Buyer Trade Name'] }}</div>\r\n            <div>TIN: {{ custom_fields['Buyer TIN'] }} — Vat No: {{ custom_fields['Buyer Vat Number'] }}</div>\r\n            <div>{{ custom_fields['Buyer Province'] }} — {{ custom_fields['Buyer City'] }} <br />{{ custom_fields['Buyer Street'] }} — {{ custom_fields['Buyer House No'] }}</div>\r\n            <div>Email: {{ custom_fields['Buyer Email'] }}</div>\r\n            <div>Phone No: {{ custom_fields['Buyer Phone No'] }}</div></div>\r\n        </td>\r\n    </tr>\r\n    {% assign title_lower = title | downcase %}\r\n    {% assign IssueDate = fields['Issue date'] %}\r\n    {% assign Reference = fields['Reference'] %}\r\n    {% assign Invoice = fields['Invoice'] %}\r\n    {% if title_lower contains 'invoice' %}\r\n        {% assign IssueDate = fields['Invoice date'] %}\r\n        {% assign Reference = fields['Invoice number'] %}\r\n        {% assign Invoice = '' %}\r\n    {% endif %}\r\n    <tr>\r\n        <td colspan='2' style='padding-top: 10px;'>\r\n            <table style='width: 100%; border-collapse: collapse; margin-bottom: 10px; background-color: #f8f9fa;'>\r\n                <tr>\r\n                    <td style='width: 33%; padding: 8px; text-align: left;'>\r\n                        <div>Customer reference No: <b>{{ Reference }}</b></div>\r\n                        <div>Date: <b>{{ custom_fields['Receipt Date'] }}</b></div>\r\n                    </td>\r\n                    <td style='width: 34%; padding: 8px; text-align: left;'>\r\n                        <div>Invoice No: <b>{{ custom_fields['Receipt Counter'] }} / {{ custom_fields['Receipt GlobalNo'] }}</b></div>\r\n                        <div>Fiscal day No: <b>{{ custom_fields['FiscalDayNo'] }}</b></div>\r\n                    </td>\r\n                    <td style='width: 33%; padding: 8px; text-align: left;'>\r\n                       <div>Fiscal device ID: <b>{{ custom_fields['DeviceID'] }}</b></div> \r\n                       <div>Device Serial No: <b>{{ custom_fields['DeviceSN'] }}</b></div>\r\n                    </td>\r\n                </tr>\r\n            </table>\r\n        </td>\r\n    </tr>\r\n    {% unless title_lower contains 'invoice' %}\r\n    <tr>\r\n        <td colspan='2'>\r\n            <div style='margin-bottom: 10px;'>\r\n                <div style='font-weight: bold; margin-bottom: 10px; text-align: center !important; color: black; text-shadow: 2px 2px 4px #aaa;'>{% if title_lower contains 'credit' %}CREDITED INVOICE{% else %}DEBITED INVOICE{% endif %}</div>\r\n                <table style='width: 100%; border-collapse: collapse; background-color: #f8f9fa;'>\r\n                    <tr>\r\n                        <td style='width: 50%; padding: 8px; text-align: left;'>\r\n                            <div>Customer reference No: <b>{{ custom_fields['Receipt NoRef'] }}</b></div>\r\n                            <div>Date: <b>{{ custom_fields['Receipt DateRef'] }}</b></div>\r\n                        </td>\r\n                        <td style='width: 50%; padding: 8px; text-align: left;'>\r\n                            <div>Invoice No: <b>{{ custom_fields['Receipt CounterRef'] }} / {{ custom_fields['Receipt GlobalNoRef'] }}</b></div>\r\n                            <div>Device Serial No: <b>{{ custom_fields['DeviceSN Ref'] }}</b></div>\r\n                        </td>\r\n                    </tr>\r\n                </table>\r\n            </div>\r\n        </td>\r\n    </tr>\r\n    {% endunless %}\r\n    <tr>\r\n        <td colspan='2'>\r\n            <table style='width: 100%'>\r\n        \t\t<thead>\r\n        \t\t    {% if description %} <tr><td colspan='99'><div style='font-size: 12px; font-weight: bold; margin-bottom: 10px'>{{ description }}</div></td></tr>{% endif %} \r\n        \t\t\t<tr>\r\n        \t\t\t\t{% if SNIdx != nil %}\r\n        \t\t\t\t<th style='padding: 5px 10px; text-align: left; vertical-align: middle; border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; background-color: #f8f9fa;'>#</th>\r\n        \t\t\t\t{% endif %}\r\n        \t\t\t\t<th style='padding: 5px 10px; text-align: left; vertical-align: middle; border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; background-color: #f8f9fa;'>Description</th>\r\n        \t\t\t\t<th style='padding: 5px 10px; text-align: right; vertical-align: middle; border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; background-color: #f8f9fa; width: 80px;'>Qty</th>\r\n        \t\t\t\t<th style='padding: 5px 10px; text-align: right; vertical-align: middle; border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; background-color: #f8f9fa; width: 80px;'>Unit Price</th>\r\n        \t\t\t\t{% if amountIdx != nil %}\r\n        \t\t\t\t<th style='padding: 5px 10px; text-align: right; vertical-align: middle; border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; background-color: #f8f9fa; width: 80px;'>Amount<br/>(excl. VAT)</th>\r\n        \t\t\t\t{% endif %}\r\n        \t\t\t\t<th style='padding: 5px 10px; text-align: right; vertical-align: middle; border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; background-color: #f8f9fa; width: 50px;'>VAT</th>\r\n        \t\t\t\t<th style='padding: 5px 10px; text-align: right; vertical-align: middle; border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; background-color: #f8f9fa; width: 100px;'>Amount<br/>(incl. VAT)</th>\r\n        \t\t\t</tr>\r\n        \t\t</thead>\r\n        \t\t<tbody>\r\n                    {% for row in table.rows %}\r\n                        {% assign SNText = nil %}\r\n                        {% assign itemText = nil %}\r\n                        {% assign descriptionText = nil %}\r\n                        {% assign qty = nil %}\r\n                        {% assign qtyText = nil %}\r\n                        {% assign unitPrice = nil %}\r\n                        {% assign unitPriceText = nil %}\r\n                        {% assign price = 0 %}\r\n                        {% assign priceText = nil %}\r\n                        {% assign discount = 0 %}\r\n                        {% assign discountText = nil %}\r\n                        {% assign amount = 0 %}\r\n                        {% assign amountText = nil %}\r\n                        {% assign taxText = ' ' %}\r\n                        {% assign taxAmount = nil %}\r\n                        {% assign taxAmountText = ' ' %}\r\n                        {% assign total = 0 %}\r\n                        {% assign totalText = nil %}\r\n                        {% for cell in row.cells %}\r\n                            {% if forloop.index0 == SNIdx %}\r\n                                {% assign SNText = cell.text %}\r\n                            {% elsif forloop.index0 == itemIdx %}\r\n                                {% assign itemText = cell.text | strip %}\r\n                            {% elsif forloop.index0 == descriptionIdx %}\r\n                                {% assign descriptionText = cell.text | strip %}\r\n                            {% elsif forloop.index0 == qtyIdx %}\r\n                                {% assign qty = cell.value %}\r\n                                {% assign qtyText = cell.value %}\r\n                            {% elsif forloop.index0 == unitPriceIdx %}\r\n                                {% assign unitPrice = cell.value %}\r\n                                {% assign unitPriceText = cell.text %}\r\n                            {% elsif forloop.index0 == priceIdx %}\r\n                                {% assign price = cell.value %}\r\n                                {% assign priceText = cell.text %}\r\n                            {% elsif forloop.index0 == discountIdx %}\r\n                                {% assign discount = cell.value %}\r\n                                {% assign discountText = cell.text %}\r\n                            {% elsif forloop.index0 == amountIdx %}\r\n                                {% assign amount = cell.value %}\r\n                                {% assign amountText = cell.text %}\r\n                            {% elsif forloop.index0 == taxIdx %}\r\n                                {% assign taxText = cell.text %}\r\n                            {% elsif forloop.index0 == taxAmountIdx %}\r\n                                {% assign taxAmount = cell.value %}\r\n                                {% assign taxAmountText = cell.text %}\r\n                            {% elsif forloop.index0 == totalIdx %}\r\n                                {% assign total = cell.value %}\r\n                                {% assign totalText = cell.text %}\r\n                            {% endif %}\r\n                            {% if descriptionText == nil or descriptionText == ' ' or descriptionText == '' %}\r\n                                {% assign descriptionText = itemText %}\r\n                            {% endif %}\r\n                        {% endfor %}\r\n                        {% if taxText == 'Exempt' or taxText == ' ' or taxText == '' %}\r\n                            {% assign taxAmountText = '0' %}\r\n                            {% assign taxAmount = 0 %}\r\n                        {% elsif taxText == 'VAT (0%)' %}\r\n                            {% assign taxAmountText = '0.00' %}\r\n                        {% endif %}\r\n                        {% if amount == 0 %}\r\n                            {% assign amountText = totalText %}\r\n                        {% endif %}\r\n                        <tr>\r\n                            {% if SNIdx != nil %}\r\n                            <td style='padding: 5px 10px; text-align: left; vertical-align: top; width: 50px;'>{{ SNText }}</td>\r\n                            {% endif %}\r\n                            <td style='padding: 5px 10px; text-align: left; vertical-align: top;'>{{ descriptionText }}</td>\r\n                            <td style='padding: 5px 10px; text-align: right; vertical-align: top; width: 80px;'>{{ qtyText }}</td>\r\n                            <td style='padding: 5px 10px; text-align: right; vertical-align: top; width: 80px;'>{{ unitPriceText }}</td>\r\n                            {% if amountIdx != nil %}\r\n                            <td style='padding: 5px 10px; text-align: right; vertical-align: top; width: 80px;'>{{ amountText }}</td>\r\n                            {% endif %}\r\n                            <td style='padding: 5px 10px; text-align: right; vertical-align: top; width: 50px;'>{{ taxAmountText }}</td>\r\n                            <td style='padding: 5px 10px; text-align: right; vertical-align: top; width: 100px;'>{{ totalText }}</td>\r\n                        </tr>\r\n                    {% endfor %}\r\n                    <tr style='border-bottom: 1px solid #ddd;'>\r\n                        <td colspan='99'> </td>\r\n                    </tr>\r\n                </tbody>\r\n            </table>\r\n            {% assign amountInWords = '' %}\r\n            {% for cf in custom_fields %}\r\n                {% if cf.label == 'Total amount in words' %}\r\n                    {% assign amountInWords = cf.text %}\r\n                {% endif %}\r\n            {% endfor %}\r\n            <table style='width: 100%;'>\r\n                <tbody>\r\n                    {% assign rowCount = 0 %}\r\n                    {% for total in table.totals %}\r\n                        {% unless total.amount == -1 and total.label == 'Sub-total' %}\r\n                        {% assign rowCount = forloop.index %}\r\n                        {% endunless %}\r\n                    {% endfor %}\r\n                    {% for total in table.totals %}\r\n                       {% unless total.amount == -1 and total.label == 'Sub-total' %}\r\n                        <tr>\r\n                            {% if forloop.first %}\r\n                                <td rowspan='{{ rowCount }}' colspan='4' style='padding: 5px 10px; text-align: left; border-top: 1px solid #dddddd; background-color: #f8f9fa;'>\r\n                                    {% if amountInWords != '' %}<p><strong>Total amount in words: </strong><br /><i>{{ amountInWords }}</i></p>{% endif %}\r\n                                </td>\r\n                            {% endif %}\r\n                            {% assign textArray = total.text | split: ' ' %}\r\n                            {% assign firstIndex = textArray | first %}\r\n                            {% assign lastIndex = textArray | last %}\r\n                            <td colspan='2' style='padding: 5px 10px; text-align: right; {% if forloop.first %} border-top: 1px solid #dddddd; {% endif %} background-color: #f8f9fa;'>\r\n                                <span style='{% if total.emphasis %} font-weight: bold; {% else %} font-weight: normal; {% endif %}'>\r\n                                    {% if total.label == 'Sub-total' %}\r\n                                        Total (excl. tax)\r\n                                    {% elsif total.label == 'Total' %}\r\n                                        Invoice total, {{ firstIndex }}\r\n                                    {% elsif total.class == 'taxAmount' %}\r\n                                        Total {{ total.label }}\r\n                                    {% else %}\r\n                                        {{ total.label }}\r\n                                    {% endif %}\r\n                                </span>\r\n                            </td>\r\n                            <td style='padding: 5px 10px; text-align: right; {% if forloop.first %} border-top: 1px solid #dddddd; {% endif %} background-color: #f8f9fa; width: 100px;'>\r\n                                <span style='{% if total.emphasis %} font-weight: bold; {% else %} font-weight: normal; {% endif %}'>\r\n                                    {{ lastIndex }}\r\n                                </span>\r\n                            </td>\r\n                        </tr>\r\n                        {% endunless %}\r\n                    {% endfor %}\r\n                </tbody>\r\n            </table>\r\n        </td>\r\n    </tr>\r\n        <tr>\r\n            <td colspan='99'>\r\n                {% if emphasis.text != null and emphasis.positive %}\r\n                <div style='text-align: center; margin-top: 40px'><span style='color: #006400; border-width: 5px; border-color: #006400; border-style: solid; padding: 10px; font-size: 20px'>{{ emphasis.text | upcase }}</span></div>\r\n                {% endif %}\r\n                {% if emphasis.text != null and emphasis.negative %}\r\n                <div style='text-align: center; margin-top: 40px'><span style='color: #FF0000; border-width: 5px; border-color: #FF0000; border-style: solid; padding: 10px; font-size: 20px'>{{ emphasis.text | upcase }}</span></div>\r\n                {% endif %}\r\n            </td>\r\n        </tr>\r\n\t\t<tr>\r\n            <td colspan='99'>\r\n\t\t\t\t \r\n\t\t\t</td>\r\n        </tr>\r\n</table>",
+      "Inactive": false
     }
   ]
 }

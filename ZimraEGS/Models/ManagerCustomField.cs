@@ -3,9 +3,9 @@
     public static class ManagerCustomField
     {
         // businessDetails & Invoice
-        public const string BusinessReferenceGuid = "f7214db4-6726-4aa9-b5cd-3ff90ce9ba6c"; //1
-        public const string FiscalDaySummaryGuid = "0f0bf167-4b63-493d-ab45-049a76a07f46";
-        public const string CertificateInfoGuid = "6a347c55-735a-4a38-8cf6-0db93dce2ded"; //31
+        public const string BusinessReferenceGuid = "f7214db4-6726-4aa9-b5cd-3ff90ce9ba6c"; //readOnly
+        public const string FiscalDaySummaryGuid = "0f0bf167-4b63-493d-ab45-049a76a07f46"; //readOnly
+        public const string CertificateInfoGuid = "6a347c55-735a-4a38-8cf6-0db93dce2ded"; //readOnly
 
         // Customers & Invoice
 
@@ -20,37 +20,41 @@
         public const string BuyerStreetGuid = "62e8d3ee-bf4d-4b3e-956f-870ed4d99a90";
         public const string BuyerHouseNoGuid = "568a19c2-bc66-4dc2-8bbd-de0768e7e283";
 
-        // Invoice
+        // Invoice, Credit Note & debit Note
+        public const string PaymentType1Guid = "5b3ebf5f-ad4f-4ffc-84d1-abda67a7d294"; //clear on create
+        public const string PaymentAmount1Guid = "e2ab11ef-73e2-4ea4-802f-55b8c834037d"; //clear on create
+        public const string PaymentType2Guid = "cb790f2c-f1b2-41d7-9b37-2ba19af4d797"; //clear on create
+        public const string PaymentAmount2Guid = "f3a2f5dd-8da8-4701-b8d5-be5877792a79"; //clear on create
 
+        public const string ReceiptDateGuid = "39b3d219-a386-4d9f-b3a0-55968b4bc7b7"; //readOnly + clear on create
+        public const string ApprovalStatusGuid = "fc6f05f9-50c7-46c0-b9f5-7fe0ca83cf2a"; //readOnly + clear on create
+        public const string ReceiptQRCodeGuid = "7eaadfa6-1fb9-4dce-9a1c-9d74beb1d0f7"; //readOnly + clear on create
+        public const string VerificationCodeGuid = "a0454495-cae8-43ef-a418-4dad69427e78"; //readOnly + hide + clear on create
+        public const string ServerResponseGuid = "75190339-992a-4fb0-bf79-f5f8226edb4b"; //readOnly + clear on create
 
-        public const string PaymentType1Guid = "5b3ebf5f-ad4f-4ffc-84d1-abda67a7d294"; //25
-        public const string PaymentAmount1Guid = "e2ab11ef-73e2-4ea4-802f-55b8c834037d"; //26
-        public const string PaymentType2Guid = "cb790f2c-f1b2-41d7-9b37-2ba19af4d797"; //27
-        public const string PaymentAmount2Guid = "f3a2f5dd-8da8-4701-b8d5-be5877792a79"; //28
+        public const string DeviceIDGuid = "d08c8744-486f-470d-82d1-29b1a1cb06ae"; //readOnly + hide + clear on create
+        public const string DeviceSNGuid = "a360538c-ebe9-49e9-8cf8-fccd51320380"; //readOnly + hide + clear on create
+        public const string FiscalDayNoGuid = "c6e40e7a-974e-4ffc-9c76-1c1ecfd05693"; //readOnly + hide + clear on create
+        public const string ReceiptCounterGuid = "a9867045-740b-493f-8b67-43b6da07e41e"; //readOnly + hide + clear on create
+        public const string ReceiptGlobalNoGuid = "4712e5df-c5e3-4b6e-9746-8ebb58a81dee"; //readOnly + hide + clear on create
 
+        //Credit Note & Debit Note
 
-        public const string ReceiptQRCodeGuid = "7eaadfa6-1fb9-4dce-9a1c-9d74beb1d0f7"; //30
-        public const string VerificationCodeGuid = "a0454495-cae8-43ef-a418-4dad69427e78"; //38
-        public const string ApprovalStatusGuid = "fc6f05f9-50c7-46c0-b9f5-7fe0ca83cf2a"; //25
-        public const string ReceiptDateGuid = "39b3d219-a386-4d9f-b3a0-55968b4bc7b7";
-        public const string ReceiptReferenceGuid = "75190339-992a-4fb0-bf79-f5f8226edb4b"; //1
+        public const string ReceiptNoRefGuid = "c7e511ba-6e9e-48ad-a61c-084e7d0f38ac";//readOnly + hide * + clear on create
+        public const string ReceiptNotesGuid = "c7e511ba-6e9e-48ad-a61c-084e7d0f38ad"; //clear on create
 
-        public const string DeviceIDGuid = "d08c8744-486f-470d-82d1-29b1a1cb06ae"; //40
-        public const string DeviceSNGuid = "a360538c-ebe9-49e9-8cf8-fccd51320380"; //41
-        public const string FiscalDayNoGuid = "c6e40e7a-974e-4ffc-9c76-1c1ecfd05693"; //42
-        public const string ReceiptCounterGuid = "a9867045-740b-493f-8b67-43b6da07e41e"; //43
-        public const string ReceiptGlobalNoGuid = "4712e5df-c5e3-4b6e-9746-8ebb58a81dee"; //44
+        public const string ReceiptRefDateGuid = "39b3d219-a386-4d9f-b3a0-55968b4bc7b8";//readOnly + hide + clear on create
+        public const string DeviceIDRefGuid = "d08c8744-486f-470d-82d1-29b1a1cb06af";//readOnly + hide + clear on create
+        public const string DeviceSNRefGuid = "a360538c-ebe9-49e9-8cf8-fccd51320381";//readOnly + hide  + clear on create
 
-        public const string ReceiptNotesGuid = "c7e511ba-6e9e-48ad-a61c-084e7d0f38ad"; //20
-        public const string DeviceIDRefGuid = "";
-        public const string DeviceSNRefGuid = "";
-        public const string FiscalDayNoRefGuid = "770e9cdb-9f55-497a-923a-f8cef6b93595"; //46
-        public const string ReceiptCounterRefGuid = "de2ba4f5-baa3-45b7-86d4-716fb923557e"; //47
-        public const string ReceiptGlobalNoRefGuid = "980cd617-4173-4b1a-b310-f8fe36ceed52"; //48
-        public const string ReceiptRefNoGuid = "";
-        public const string ReceiptRefDateGuid = "";
+        public const string FiscalDayNoRefGuid = "c6e40e7a-974e-4ffc-9c76-1c1ecfd05694"; //readOnly + hide + clear on create
+        public const string ReceiptCounterRefGuid = "a9867045-740b-493f-8b67-43b6da07e41f"; //readOnly + hide + clear on create
+        public const string ReceiptGlobalNoRefGuid = "4712e5df-c5e3-4b6e-9746-8ebb58a81def"; //readOnly + hide + clear on create
+
         // Item for VAT
         public const string HsCodeGuid = "329de867-9cf1-4dfe-8b06-5084bce788c7"; //0
+
+        public const string AppVersionGuid = "329de867-9cf1-4dfe-8b06-5084bce788c8";
 
     }
 }

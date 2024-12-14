@@ -30,7 +30,37 @@ namespace ZimraEGS.Controllers
                     TempData["SetupViewModel"] = JsonConvert.SerializeObject(setupViewModel);
 
                     return RedirectToAction("Register", "Setup");
+                }
+                
+                //if (relayData.EGSVersion <= 2410190001)
+                //{
 
+                //    var businessDetails = relayData.BusinessDetailJson;
+                //    businessDetails = RelayDataHelper.ModifyStringCustomFields2(businessDetails, ManagerCustomField.AppVersionGuid, VersionHelper.GetVersion());
+                    
+                //    var svm = new SetupViewModel
+                //    {
+                //        Referrer = relayData.Referrer,
+                //        BusinessDetailsJson = businessDetails,
+                //        Api = relayData.Api,
+                //        Token = relayData.Token,
+                //    };
+
+                //    TempData["SetupViewModel"] = JsonConvert.SerializeObject(svm);
+                //    return RedirectToAction("UpdateBusinessData", "Setup");
+                //}
+
+                if (relayData.BusinessReference.LastApprovalStatus == "REJECTED")
+                {
+                    if(relayData.FormKey != relayData.BusinessReference.ReceiptUUID)
+                    {
+                        ErrorViewModel errorViewModel = new ErrorViewModel
+                        {
+                            Referrer = relayData.Referrer,
+                            ErrorMessage = "Last Invoice was Rejected, Cannot Reporting New Receipt"
+                        };
+                        return View("Error", errorViewModel);
+                    }
                 }
 
                 var deviceID = relayData.CertificateInfo.DeviceID;
@@ -67,7 +97,6 @@ namespace ZimraEGS.Controllers
 
                             TempData["CertIfoVewModel"] = JsonConvert.SerializeObject(certIfoVew);
                             return RedirectToAction("IssueCertificate", "FiscalDevice");
-
                         }
 
                         OpenDayViewModel openDayViewModel = relayData.GetOpenDayViewModel();
@@ -76,7 +105,6 @@ namespace ZimraEGS.Controllers
                     }
                     else
                     {
-                        // Check if invoice Has been Approved
                         // Check if invoice has been approved
                         if (relayData.ApprovalStatus == "APPROVED")
                         {
@@ -113,6 +141,19 @@ namespace ZimraEGS.Controllers
                 ReceiptHelper rh = new ReceiptHelper(relayData);
                 relayData.Receipt = rh.GenerateZimraReceipt();
 
+                if (relayData.BusinessReference.LastApprovalStatus == "REJECTED")
+                {
+                    if (Convert.ToBase64String(relayData.Receipt.ReceiptDeviceSignature.Hash) != relayData.BusinessReference.LastReceiptHash)
+                    {
+                        ErrorViewModel errorViewModel = new ErrorViewModel
+                        {
+                            Referrer = relayData.Referrer,
+                            ErrorMessage = "InvoiceHash does not Match Last Rejected Invoice"
+                        };
+                        return View("Error", errorViewModel);
+                    }
+                }
+
                 RelayDataViewModel viewModel = relayData.GetRelayDataViewModel();
 
                 return View(viewModel);
@@ -124,7 +165,6 @@ namespace ZimraEGS.Controllers
             }
         }
         
-
         public async Task<IActionResult> AjaxSubmitReceipt([FromForm] RelayDataViewModel model)
         {
             try
@@ -176,8 +216,9 @@ namespace ZimraEGS.Controllers
                     var invoiceJson = model.InvoiceJson;
 
                     invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, ManagerCustomField.ApprovalStatusGuid, ApprovalStatus);
-                    invoiceJson = RelayDataHelper.UpdateOrCreateField(invoiceJson, model.ReceiptType == ReceiptType.FiscalInvoice ? "IssueDate" : "Date", model.InvoiceDate);
-                    invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, ManagerCustomField.ReceiptDateGuid, model.InvoiceDate.ToString("yyyy-MM-ddTHH:mm:ss"));
+                    
+                    invoiceJson = RelayDataHelper.UpdateOrCreateField(invoiceJson, model.ReceiptType == ReceiptType.FiscalInvoice ? "IssueDate" : "Date", model.ReceiptDate.ToString("yyyy-MM-dd"));
+                    invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, ManagerCustomField.ReceiptDateGuid, model.ReceiptDate.ToString("yyyy-MM-dd HH:mm:ss"));
 
                     invoiceJson = RelayDataHelper.UpdateOrCreateField(invoiceJson, "Reference", model.InvoiceNumber);
 
@@ -189,7 +230,7 @@ namespace ZimraEGS.Controllers
 
                     model.InvoiceReferenceJson = JsonConvert.SerializeObject(invoiceReference, Formatting.Indented);
 
-                    invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, ManagerCustomField.ReceiptReferenceGuid, model.InvoiceReferenceJson);
+                    invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, ManagerCustomField.ServerResponseGuid, model.InvoiceReferenceJson);
 
                     invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, ManagerCustomField.ReceiptQRCodeGuid, model.ReceiptQrCode);
 
@@ -212,8 +253,8 @@ namespace ZimraEGS.Controllers
                         invoiceJson = RelayDataHelper.ModifyDecimalCustomFields2(invoiceJson, ManagerCustomField.ReceiptGlobalNoRefGuid, model.ReceiptGlobalNoRef);
                         invoiceJson = RelayDataHelper.ModifyDecimalCustomFields2(invoiceJson, ManagerCustomField.ReceiptCounterRefGuid, model.ReceiptCounterRef);
 
-                        invoiceJson = RelayDataHelper.ModifyDecimalCustomFields2(invoiceJson, ManagerCustomField.ReceiptRefNoGuid, model.ReceiptRefNo);
-                        invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, ManagerCustomField.ReceiptRefDateGuid, model.ReceiptRefDate);
+                        invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, ManagerCustomField.ReceiptNoRefGuid, model.ReceiptRefNo);
+                        invoiceJson = RelayDataHelper.ModifyStringCustomFields2(invoiceJson, ManagerCustomField.ReceiptRefDateGuid, model.ReceiptRefDate.ToString("yyyy-MM-dd HH:mm:ss"));
                     }
 
                     // Process Business Details JSON
@@ -227,20 +268,14 @@ namespace ZimraEGS.Controllers
                         if (businessreference == null) { businessreference = new BusinessReference(); }
                     }
 
-                    businessreference.IntegrationType = model.IntegrationType;
-                    businessreference.DeviceID = model.DeviceID;
-                    businessreference.DeviceSerialNumber = model.DeviceSN;
-                    businessreference.FiscalDayStatus = model.FiscalDayStatus;
-                    businessreference.LastFiscalDayNo = model.FiscalDayNo;
-
                     businessreference.LastApprovalStatus = ApprovalStatus;
-
                     businessreference.LastReceiptCounter = model.ReceiptCounter;
 
                     if (ApprovalStatus == "APPROVED")
                     {
                         businessreference.LastReceiptGlobalNo = model.ReceiptGlobalNo;
                         businessreference.LastReceiptHash = model.ReceiptHash;
+                        businessreference.ReceiptUUID = model.FormKey;
 
                         businessJson = RelayDataHelper.ModifyStringCustomFields2(businessJson, ManagerCustomField.BusinessReferenceGuid, JsonConvert.SerializeObject(businessreference, Formatting.Indented));
 

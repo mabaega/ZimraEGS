@@ -25,18 +25,20 @@ namespace ZimraEGS.Helpers
             receipt.ReceiptCounter = relayData.BusinessReference.LastReceiptCounter + 1;
 
             //Handle Rejected Invoice
-            if (relayData.InvReceiptGlobalNo == 0) //New Invoice
+            if (relayData.ApprovalStatus != "REJECTED") //New Invoice
             {
-                receipt.ReceiptGlobalNo = relayData.DeviceStatus.LastReceiptGlobalNo + 1;
+                //receipt.ReceiptGlobalNo = relayData.DeviceStatus.LastReceiptGlobalNo + 1;
+                receipt.ReceiptGlobalNo = relayData.BusinessReference.LastReceiptGlobalNo + 1;
                 receipt.ReceiptDate = DateTimeOffset.Now;
             }
             else
             {
                 receipt.ReceiptGlobalNo = relayData.InvReceiptGlobalNo;
-                receipt.ReceiptDate = relayData.InvReceiptDate ?? DateTimeOffset.Now;
+                receipt.ReceiptDate = relayData.ReceiptDate ?? DateTimeOffset.Now;
             }
 
-            receipt.InvoiceNo = receipt.ReceiptGlobalNo.ToString("D4");
+            int InvNumber = relayData.DeviceStatus.LastFiscalDayNo ?? 1;
+            receipt.InvoiceNo = $"{InvNumber:D4}-{receipt.ReceiptCounter:D4}";
 
             receipt.BuyerData = new Buyer
             {
@@ -63,10 +65,12 @@ namespace ZimraEGS.Helpers
                 receipt.ReceiptNotes = relayData.ReceiptNotes ?? "-";
                 receipt.CreditDebitNote = new CreditDebitNote
                 {
-                    ReceiptID = relayData.ReceiptCounterRef,
+                    ReceiptID = relayData.ReceiptID,
                     DeviceID = relayData.DeviceIDRef,
                     ReceiptGlobalNo = relayData.ReceiptGlobalNoRef,
-                    FiscalDayNo = relayData.FiscalDayNoRef
+                    FiscalDayNo = relayData.FiscalDayNoRef,
+                    ReceiptRefDate = relayData.ReceiptRefDate 
+                    
                 };
             }
 
@@ -173,10 +177,9 @@ namespace ZimraEGS.Helpers
                 rl.ReceiptLineName = GetFirstNonNullOrEmpty(l.LineDescription, l.Item.Name, l.Item.ItemName);
                 rl.ReceiptLineHSCode = HsCode.PadLeft(8, '0');
                 rl.ReceiptLineQuantity = Math.Round(l.Qty, 2);
-                //rl.ReceiptLinePrice = Math.Round(isIncludeTax ? unitPrice / (1 + (taxRate / 100)) : unitPrice, 4);
                 rl.ReceiptLinePrice = Math.Round(unitPrice, 4);
 
-                if (relayData.ReceiptType == ReceiptType.DebitNote)
+                if (relayData.ReceiptType == ReceiptType.CreditNote)
                 {
                     rl.ReceiptLinePrice = -1 * rl.ReceiptLinePrice;
                 }
@@ -222,10 +225,9 @@ namespace ZimraEGS.Helpers
                     rl.ReceiptLineName = "Discount: " + GetFirstNonNullOrEmpty(l.LineDescription, l.Item.Name, l.Item.ItemName);
                     rl.ReceiptLineHSCode = HsCode;
                     rl.ReceiptLineQuantity = Math.Round(l.Qty, 2);
-                    //rl.ReceiptLinePrice = Math.Round(-1 * (isIncludeTax ? unitPrice / (1 + (taxRate / 100)) : unitPrice), 4);
                     rl.ReceiptLinePrice = Math.Round(-1 * (unitPrice), 4);
 
-                    if (relayData.ReceiptType == ReceiptType.DebitNote)
+                    if (relayData.ReceiptType == ReceiptType.CreditNote)
                     {
                         rl.ReceiptLinePrice = -1 * rl.ReceiptLinePrice;
                     }
@@ -304,39 +306,6 @@ namespace ZimraEGS.Helpers
 
             return ls.OrderBy(x => x.TaxID).OrderBy(x => x.LineNumber).ToList();
         }
-        private List<ReceiptTax> GetReceiptTaxs(List<ReceiptLine> receiptLines)
-        {
-            List<ReceiptTax> ls = new List<ReceiptTax>();
-
-            foreach (ReceiptLine ln in receiptLines)
-            {
-                ReceiptTax receiptTax = new ReceiptTax();
-                //receiptTax.TaxCode = ln.TaxCode;
-                receiptTax.TaxID = ln.TaxID;
-                if (ln.TaxPercent != null) { receiptTax.TaxPercent = ln.TaxPercent; }
-
-                var tx = (double)(ln.TaxPercent == null ? 0 : ln.TaxPercent);
-                double tpersen = tx / 100;
-
-                receiptTax.TaxAmount = Math.Round(ln.ReceiptLineTotal * tpersen, 2);
-                receiptTax.SalesAmountWithTax = ln.ReceiptLineTotal + receiptTax.TaxAmount;
-
-                ls.Add(receiptTax);
-            }
-
-            // Group by TaxCode, TaxID, TaxPercent and sum TaxAmount and SalesAmountWithTax
-            var groupedResult = ls.GroupBy(x => new { x.TaxCode, x.TaxID, x.TaxPercent })
-                                  .Select(g => new ReceiptTax
-                                  {
-                                      TaxCode = g.Key.TaxCode,
-                                      TaxID = g.Key.TaxID,
-                                      TaxPercent = g.Key.TaxPercent,
-                                      TaxAmount = g.Sum(x => x.TaxAmount),
-                                      SalesAmountWithTax = g.Sum(x => x.SalesAmountWithTax)
-                                  }).OrderBy(o => o.TaxID).ToList();
-
-            return groupedResult;
-        }
         private List<Payment> GetPayments()
         {
             List<Payment> ls = new List<Payment>();
@@ -348,7 +317,8 @@ namespace ZimraEGS.Helpers
                     ls.Add(new Payment
                     {
                         MoneyTypeCode = (MoneyType)t,
-                        PaymentAmount = relayData.PaymentAmount1
+                        PaymentAmount = ((relayData.ReceiptType == ReceiptType.CreditNote) ? -1 : 1) * relayData.PaymentAmount1
+                   
                     });
                 }
             }
@@ -360,7 +330,7 @@ namespace ZimraEGS.Helpers
                     ls.Add(new Payment
                     {
                         MoneyTypeCode = (MoneyType)t,
-                        PaymentAmount = relayData.PaymentAmount2
+                        PaymentAmount = ((relayData.ReceiptType == ReceiptType.CreditNote) ? -1 : 1) * relayData.PaymentAmount2
                     });
                 }
             }

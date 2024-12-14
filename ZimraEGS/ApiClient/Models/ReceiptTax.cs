@@ -22,7 +22,7 @@
 
         [Newtonsoft.Json.JsonIgnore]
         public string TaxPersenString => TaxPercent.HasValue
-        ? TaxPercent.Value.ToString("N2")
+        ? TaxPercent.Value.ToString("F2")
         : string.Empty;
 
         [Newtonsoft.Json.JsonIgnore]

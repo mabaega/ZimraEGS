@@ -48,16 +48,10 @@ namespace ZimraEGS.Controllers
             return RedirectToAction("Error", "Home");
         }
 
-        public IActionResult CloseDay()
-        {
-            if (TempData["CloseDayViewModel"] is string relayDataJson)
-            {
-                string closeDayViewModel = TempData["CloseDayViewModel"].ToString();
-                CloseDayViewModel model = JsonConvert.DeserializeObject<CloseDayViewModel>(closeDayViewModel);
-                return View(model);
-            }
-
-            return RedirectToAction("Error", "Home");
+        [HttpPost]
+        public IActionResult CloseDay(CloseDayViewModel model) 
+        { 
+            return View(model); 
         }
 
         [HttpPost]
@@ -86,6 +80,8 @@ namespace ZimraEGS.Controllers
 
                 if (openDayResponse.StatusCode == System.Net.HttpStatusCode.OK)
                 {
+                    Thread.Sleep(5000);
+
                     ServerResponse deviceStatusResponse = await apiHelper.SendGetRequestAsync(
                         "GetStatus",
                         deviceID,
@@ -111,15 +107,15 @@ namespace ZimraEGS.Controllers
                         // Create a new BusinessReference object and modify only the needed properties
                         var businessReference = new BusinessReference
                         {
-                            LastReceiptCounter = model.LastReceiptCounter, // Use the updated value
-                            LastReceiptHash = model.LastReceiptHash,       // Use the updated value
+                            LastReceiptCounter = 0, // Use the updated value
+                            LastReceiptHash = "",       // Use the updated value
                             IntegrationType = model.IntegrationType,
                             DeviceID = model.DeviceID,
                             DeviceSerialNumber = model.DeviceSerialNumber,
                             FiscalDayOpened = openDayRequest.FiscalDayOpened,
-                            FiscalDayStatus = model.FiscalDayStatus,
-                            LastFiscalDayNo = model.LastFiscalDayNo,
-                            LastReceiptGlobalNo = model.LastReceiptGlobalNo
+                            FiscalDayStatus = deviceStatus.FiscalDayStatus,
+                            LastFiscalDayNo = (int)deviceStatus.LastFiscalDayNo,
+                            LastReceiptGlobalNo = 0  //deviceStatus.LastReceiptGlobalNo
                         };
 
                         // Modify the business JSON with the updated BusinessReference details
@@ -193,10 +189,11 @@ namespace ZimraEGS.Controllers
 
                 closeDayRequest.FiscalDayCounters = FiscalDayProcessor.GetFiscalDayCounter(FiscalDaySummary);
 
+
                 var counterHash = FiscalDayProcessor.ToHashString(closeDayRequest.FiscalDayCounters.ToList());
 
                 string SourcesHash = CertificateInfo.DeviceID.ToString("F0") +
-                    closeDayRequest.FiscalDayNo +
+                    closeDayRequest.FiscalDayNo.ToString("F0") +
                     BusinessReference.FiscalDayOpened.ToString("yyyy-MM-dd") +
                     counterHash;
 
@@ -215,7 +212,6 @@ namespace ZimraEGS.Controllers
 
                 closeDayRequest.ReceiptCounter = BusinessReference.LastReceiptCounter;
 
-
                 ApiHelper apiHelper = new ApiHelper(CertificateInfo.Base64Pfx, CertificateInfo.IntegrationType);
                 ServerResponse closeDayResponse = await apiHelper.SendPostRequestAsync<CloseDayRequest>(
                     "CloseDay",
@@ -229,6 +225,8 @@ namespace ZimraEGS.Controllers
 
                 if (closeDayResponse.StatusCode == System.Net.HttpStatusCode.OK)
                 {
+                    
+                    Thread.Sleep(10000);
 
                     ServerResponse statusresponse = await apiHelper.SendGetRequestAsync(
                         "GetStatus",
@@ -241,12 +239,6 @@ namespace ZimraEGS.Controllers
                     {
                         deviceStatus = statusresponse.GetContentAs<GetStatusResponse>();
 
-                        if (deviceStatus.FiscalDayStatus != ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed || deviceStatus.FiscalDayStatus != ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayCloseInitiated)
-                        {
-                            return StatusCode((int)System.Net.HttpStatusCode.BadRequest, new { Error = statusresponse.GetFullResponseAsJson() });
-                        }
-
-                        // Create combined object
                         var combinedApiObject = new
                         {
                             closeDayRequest,
@@ -254,9 +246,7 @@ namespace ZimraEGS.Controllers
                             GetStatusResponse = deviceStatus,
                         };
 
-                        // Serialize combined object to JSON
                         string combinedJson = JsonConvert.SerializeObject(combinedApiObject, Formatting.Indented);
-
                         return Ok(combinedJson);
                     }
                 }

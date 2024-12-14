@@ -5,8 +5,8 @@
 
 @{
     Layout = null;
-    var apiReference = Newtonsoft.Json.JsonConvert.SerializeObject(TempData["ApiReference"]);
-    var apiInvoice = Newtonsoft.Json.JsonConvert.SerializeObject(TempData["ApiInvoice"]);
+    // var apiReference = Newtonsoft.Json.JsonConvert.SerializeObject(TempData["ApiReference"]);
+    // var apiInvoice = Newtonsoft.Json.JsonConvert.SerializeObject(TempData["ApiInvoice"]);
 }
 
 @functions {
@@ -112,7 +112,8 @@
 
     <main class="flex-grow-1 d-flex align-items-center justify-content-center">
         <div class="container rounded text-center">
-            <form id="relayForm" method="POST">
+           @*  <form> *@
+
                 <div class="container">
                     <div class="text-center pb-1">
                         <img src="~/images/logo.png" alt="ZimraEGS" class="img-fluid" style="max-width: 60px;" />
@@ -128,7 +129,7 @@
                 <div class="row">
 
                     <div class="col-lg-9">
-
+                        <form id="relayForm" method="POST">
                         <div class="card mb-4">
                             <div class="card-header"><h5>Receipt Info</h5></div>
                             <div class="card-body" style="min-height: 605px;">
@@ -158,7 +159,7 @@
                                 </div>
 
                                 <div class="row">
-                                    
+
                                     <div class="col-md-3">
                                         <div class="mb-2">
                                             <label for="InvoiceNumber" class="form-label">Invoice No:</label>
@@ -168,8 +169,8 @@
 
                                     <div class="col-md-3">
                                         <div class="mb-2">
-                                            <label for="InvoiceDate" class="form-label">Receipt Date:</label>
-                                            <input type="text" class="form-control form-control-sm text-center" id="InvoiceDate" name="InvoiceDate" value="@Model.InvoiceDate.ToString("yyyy-MM-dd HH:mm:ss")" readonly>
+                                            <label for="ReceiptDate" class="form-label">Receipt Date:</label>
+                                            <input type="text" class="form-control form-control-sm text-center" id="ReceiptDate" name="ReceiptDate" value="@Model.ReceiptDate.ToString("yyyy-MM-dd HH:mm:ss")" readonly>
                                         </div>
                                     </div>
 
@@ -233,7 +234,7 @@
                                 <input type="hidden" name="DeviceSN" value="@Model.DeviceSN" />
                                 <input type="hidden" name="DeviceModelName" value="@Model.DeviceModelName" />
                                 <input type="hidden" name="DeviceModelVersion" value="@Model.DeviceModelVersion" />
-                                
+
                                 <input type="hidden" name="Base64Pfx" value="@Model.Base64Pfx" />
                                 <input type="hidden" name="PrivateKey" value="@Model.PrivateKey" />
                                 <input type="hidden" name="IntegrationType" value="@Model.IntegrationType" />
@@ -255,7 +256,7 @@
                                 <input type="hidden" name="FiscalDayOpened" value="@Model.FiscalDayOpened" />
                                 <input type="hidden" name="InvoiceTotal" value="@Model.InvoiceTotal" />
                                 <input type="hidden" name="TmpReceiptVerificationCode" value="@Model.TmpReceiptVerificationCode" />
-                                
+
                                 <hr style="margin: 5px 0px;" />
 
                                 <!-- Tab Navigation -->
@@ -297,7 +298,7 @@
                                                         ;
                                                     }
                                                 }
-                                        </textarea>
+                                            </textarea>
                                         </div>
                                     </div>
                                     <div class="tab-pane fade" id="nav-json" role="tabpanel" aria-labelledby="nav-json-tab">
@@ -324,13 +325,21 @@
                                                         ;
                                                     }
                                                 }
-                                        </textarea>
+                                            </textarea>
                                         </div>
                                     </div>
                                     <div class="tab-pane fade show active" id="nav-response" role="tabpanel" aria-labelledby="nav-response-tab">
                                         <div class="mb-2">
                                             <textarea class="form-control form-control-sm" id="textareaResponse" name="PortalResult" rows="10" readonly wrap="off" style="margin-top: 10px; min-height: 200px;">
-                                        </textarea>
+                                                @{
+                                                    if (!string.IsNullOrEmpty(Model.ReceiptErrors))
+                                                    {
+                                                        <text>Receipt Error : </text>
+                                                        @Model.ReceiptErrors
+                                                        ;
+                                                    }
+                                                }
+                                                </textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -345,7 +354,7 @@
 
                                     <div id="buttonsContainer">
 
-                                        @if (Model.FiscalDayStatus == ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayOpened)
+                                        @if (Model.FiscalDayStatus != ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayClosed && string.IsNullOrEmpty(Model.ReceiptErrors))
                                         {
                                             <button id="submitReceiptButton" class="btn btn-info mt-1">
                                                 <i class="fas fa-spinner fa-spin hidden"></i>
@@ -360,9 +369,9 @@
 
                             </div>
                         </div>
-
+                    </form>
                     </div>
-
+                
                     <div class="col-lg-3">
                         <!-- Side widget -->
                         <div class="card mb-4">
@@ -395,11 +404,13 @@
                                 <!-- Close Fiscal Day Buttons -->
                                 @if((Model.FiscalDayStatus == ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayOpened && Model.TimeForCloseDay ) || 
                                 Model.FiscalDayStatus == ZimraEGS.ApiClient.Enums.FiscalDayStatus.FiscalDayCloseFailed){
-                                    <div id="fisacalButtonContainar" class="text-center mb-4">
-                                        <button id="closeDayButton" class="btn btn-warning">
-                                            <i class="fas fa-spinner fa-spin hidden"></i> Close Fiscal Day
-                                        </button>
-                                    </div>
+                                     <form asp-action="CloseDay" asp-controller="FiscalDevice" method="post"> 
+                                         @Html.HiddenFor(model => model.Api) 
+                                         @Html.HiddenFor(model => model.Token) 
+                                         @Html.HiddenFor(model => model.Referrer) 
+                                         @Html.HiddenFor(model => model.BusinessDetailJson) 
+                                         <button type="submit" class="btn btn-danger btn-sm" style="width: 200px;"> Close FiscalDay </button> 
+                                     </form>
                                 }
 
                                 <hr />
@@ -432,19 +443,14 @@
                                     </div>
                                 }
 
-
                             </div>
                         </div>
                     </div>
-
-
                 </div>
-            </form>
+                @* </form> *@
         </div>
     </main>
 
-
-    <div id="progress" style="display: none;">Processing...</div>
 
     <footer class="footer py-3 bg-body-tertiary">
         <div class="container text-center">
@@ -452,6 +458,7 @@
         </div>
     </footer>
 
+    <div class="loading-indicator" id="loadingIndicator"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -459,11 +466,19 @@
 
         $(document).ready(function () {
 
+            function showLoading() {
+                $('#loadingIndicator').show();
+            }
+
+            function hideLoading() {
+                $('#loadingIndicator').hide();
+            }
+
             $('#submitReceiptButton').click(function (e) {
                 e.preventDefault();
 
                 var $btn = $(this);
-                $btn.find('.fa-spinner').removeClass('hidden');
+                showLoading(); // Show loading indicator
 
                 var formData = $('form').serialize();
 
@@ -472,17 +487,15 @@
                     method: 'POST',
                     data: formData,
                     success: function (response) {
-                        //console.log(response);
                         try {
                             if (typeof response === 'string') {
                                 response = JSON.parse(response);
                             }
 
-                          var message = "";
+                            var message = "";
 
                             // Process API reference update
                             if (response.ApiReference) {
-
                                 const apiRef = response.ApiReference;
 
                                 fetch(apiRef.ApiUrl, {
@@ -533,7 +546,8 @@
                             var formattedJson = JSON.stringify(response.SubmitReceiptResponse, null, 4);
                             $('#textareaResponse').val(formattedJson);
 
-                            $btn.hide();
+                            $btn.prop('disabled', true); // Disable the button
+                            $btn.text('Receipt Submitted'); // Change button text
 
                         } catch (err) {
                             console.error('Error processing response:', err);
@@ -544,16 +558,46 @@
                         $('#textareaResponse').val('Error: ' + xhr.responseText);
                     },
                     complete: function () {
-                        $btn.find('.fa-spinner').addClass('hidden');
+                        hideLoading(); // Hide loading indicator
                     }
                 });
             });
 
-            $(document).on('click', '#submitReceiptButton, #openDayButton', function () {
-                var $btn = $(this);
-                $btn.find('.fa-spinner').removeClass('hidden');
-            });
 
+            $('#closeDayButton').click(function (e) {
+                e.preventDefault();
+
+                // Gather data from RelayDataViewModel
+                var api = '@Model.Api';
+                var token = '@Model.Token';
+                var referrer = '@Model.Referrer';
+                var businessDetailJson = '@Model.BusinessDetailJson';
+
+                // Create CloseDayViewModel object
+                var closeDayViewModel = {
+                    Api: api,
+                    Token: token,
+                    Referrer: referrer,
+                    BusinessDetailJson: businessDetailJson
+                };
+
+                // Send the data to the CloseDay method in FiscalDevice
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("CloseDay", "FiscalDevice")',
+                    data: JSON.stringify(closeDayViewModel),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (response) {
+                        // Handle success (e.g., redirect to CloseDay.cshtml)
+                        window.location.href = response.redirectUrl;
+                    },
+                    error: function (error) {
+                        // Handle error
+                        console.error('Error:', error);
+                    }
+                });
+            });
+     
             function generateQRCode(text) {
                 new QRCode(document.getElementById("qrCodeImage"), {
                     text: text,

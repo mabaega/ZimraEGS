@@ -5,7 +5,6 @@ using ZimraEGS.ApiClient.Models;
 
 namespace ZimraEGS.Models
 {
-
     public class RelayDataViewModel
     {
         public string Referrer { get; set; } = string.Empty;
@@ -15,9 +14,10 @@ namespace ZimraEGS.Models
 
         public string InvoiceNumber { get; set; } = string.Empty;
 
-        [JsonProperty("InvoiceDate")]
+        [JsonProperty("ReceiptDate")]
         [Newtonsoft.Json.JsonConverter(typeof(LocalDateTimeConverter))]
-        public DateTimeOffset InvoiceDate { get; set; }
+        public DateTimeOffset ReceiptDate { get; set; }
+        
         public double InvoiceTotal { get; set; } = 0;
         public string BuyerRegisterName { get; set; } = string.Empty;
         public double InvoiceRoundOff { get; set; } = 0;
@@ -45,8 +45,11 @@ namespace ZimraEGS.Models
         public int FiscalDayNoRef { get; set; } = 0;
         public int ReceiptCounterRef { get; set; } = 0;
         public int ReceiptGlobalNoRef { get; set; } = 0;
-        public int ReceiptRefNo { get; set; } = 0;
-        public string ReceiptRefDate { get; set; } = string.Empty;
+        public string ReceiptRefNo { get; set; }
+
+        [JsonProperty("ReceiptRefDate")]
+        [Newtonsoft.Json.JsonConverter(typeof(LocalDateTimeConverter))]
+        public DateTimeOffset ReceiptRefDate { get; set; }
 
         public string CurrencyCode { get; set; } = string.Empty;
         public ReceiptType ReceiptType { get; set; } = ReceiptType.FiscalInvoice;
@@ -68,6 +71,7 @@ namespace ZimraEGS.Models
         public string InvoiceReferenceJson { get; set; }
         public string BusinessReferenceJson { get; set; }
 
+        public string ReceiptErrors { get; set; }= string.Empty;
         public bool TimeForCloseDay { get; set; }
         public RelayDataViewModel() { }
 

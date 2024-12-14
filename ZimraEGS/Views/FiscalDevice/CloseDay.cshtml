@@ -4,7 +4,30 @@
 
 @{
     ViewData["Title"] = "Zimra Integration Setup";
-    
+    string jsonBusiness = Model.BusinessDetailJson;
+
+    BusinessReference BusinessReference = new BusinessReference();
+    FiscalDaySummary FiscalDaySummary = new FiscalDaySummary();
+
+    string brf = RelayDataHelper.FindStringValueInJson(jsonBusiness, ManagerCustomField.BusinessReferenceGuid);
+    if (!string.IsNullOrEmpty(brf))
+    {
+        BusinessReference = JsonConvert.DeserializeObject<BusinessReference>(brf);
+    }
+
+    string fds = RelayDataHelper.FindStringValueInJson(jsonBusiness, ManagerCustomField.FiscalDaySummaryGuid);
+    if (!string.IsNullOrEmpty(fds))
+    {
+        FiscalDaySummary = JsonConvert.DeserializeObject<FiscalDaySummary>(fds);
+    }
+
+    var combinedObject = new
+    {
+        BusinessReference,
+        FiscalDaySummary 
+    };
+
+    string combinedJson = JsonConvert.SerializeObject(combinedObject, Formatting.Indented);
 }
 
 <div class="container-fluid setup-container">
@@ -40,8 +63,7 @@
                                     @{
                                         try
                                         {
-                                            var formattedJson = Utils.SerializeObject(JsonConvert.DeserializeObject(Model.BusinessDetailJson));
-                                            @Html.Raw(formattedJson)
+                                            @Html.Raw(combinedJson)
                                             ;
                                         }
                                         catch (Exception ex)
@@ -78,59 +100,69 @@
     </div>
 </div>
 
-<div class="loading-indicator" id="loadingIndicator" style="display: none;">
-    <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-</div>
+<div class="loading-indicator" id="loadingIndicator"></div>
+
 
 @section Scripts {
-    <script src="~/js/qrcode.js"></script>
     <script>
+
         $(document).ready(function () {
             function showLoading() {
-                $('#loadingIndicator').fadeIn();
+                document.getElementById('loadingIndicator').style.display = 'block';
             }
 
             function hideLoading() {
-                $('#loadingIndicator').fadeOut();
+                document.getElementById('loadingIndicator').style.display = 'none';
             }
 
             $('#closeDayButton').click(async function (e) {
                 e.preventDefault();
 
-                const $btn = $(this);
-                const spinner = $btn.find('.fa-spinner');
-                spinner.removeClass('hidden');
+                var $btn = $(this);
+                $btn.prop('disabled', true);
+                
+                showLoading()
 
-                const formData = $('form').serialize();
+                const formData = $(this).closest('form').serialize();
 
                 try {
                     const response = await $.ajax({
-                        url: '@Url.Action("AjaxCloseDay")',
+                        url: '@Url.Action("AjaxCloseDay", "FiscalDevice")',
                         method: 'POST',
-                        data: formData
+                        data: formData,
+                        dataType: 'json', // Expecting JSON response
+                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
                     });
-
-                    // Parse response
-                    if (typeof response === 'string') {
-                        response = JSON.parse(response);
-                    }
 
                     let message = '';
 
-                    const formattedJson = JSON.stringify(response, null, 4);
-                    $('#textareaResponse').val(formattedJson);
-                    $btn.prop('disabled', true); 
-                    $btn.text('FiscalDay Closed');
+                    if (response && response.error) {
+                        message = `Error: ${response.error}`;
+                        if (response.details) {
+                            message += `\nDetails: ${response.details}`;
+                        }
+                    } else {
+                        message = JSON.stringify(response, null, 4);
+                        $btn.prop('disabled', true);
+                        $btn.text('FiscalDay Closed');
+                    }
+
+                    $('#textareaResponse').val(message);
 
                 } catch (error) {
-                    $('#textareaResponse').val('Error: ' + error.message);
+                    let errorMessage = 'An error occurred while processing the request.';
+
+                    if (error.responseJSON && error.responseJSON.error) {
+                        errorMessage = `Error: ${error.responseJSON.error}`;
+                    }
+
+                    $('#textareaResponse').val(errorMessage);
                     console.error('Error processing request:', error);
                 } finally {
-                    spinner.addClass('hidden');
+                    hideLoading();
                 }
             });
+
         });
     </script>
 }

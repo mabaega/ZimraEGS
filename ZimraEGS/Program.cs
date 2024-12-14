@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Localization;
 using Newtonsoft.Json;
 using System.Globalization;
+using System.Text.Json.Serialization;
 
 namespace ZimraEGS
 {
@@ -12,9 +14,9 @@ namespace ZimraEGS
 
             var builder = WebApplication.CreateBuilder(args);
             // Configure JSON options
-            //builder.Services.Configure<JsonOptions>(options =>
-            //    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull);
-            
+            builder.Services.Configure<JsonOptions>(options =>
+                options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull);
+
             //builder.Services.AddControllers()
             //.AddNewtonsoftJson(options =>
             //{
@@ -22,7 +24,7 @@ namespace ZimraEGS
             //    options.SerializerSettings.Converters.Add(new ZimraEGS.ApiClient.Helpers.LocalDateTimeConverter()); // Add your custom converter
             //    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore; // Optional: ignore null values
             //});
-            
+
             // Configure CORS
             builder.Services.AddCors(options =>
             {

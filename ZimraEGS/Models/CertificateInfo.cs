@@ -7,16 +7,16 @@ namespace ZimraEGS.Models
     public class CertificateInfo
     {
         public PlatformType IntegrationType { get; set; } = PlatformType.Simulation;
-        public int DeviceID { get; set; } = 20203;
-        public string DeviceSerialNumber { get; set; } = "MGR2401";
-        public string ActivationKey { get; set; } = "00375086";
+        public int DeviceID { get; set; } = 0;
+        public string DeviceSerialNumber { get; set; } = "";
+        public string ActivationKey { get; set; } = "";
         public string DeviceModelName { get; set; } = "Server";
         public string DeviceModelVersion { get; set; } = "v1";
 
         public string CommonName { get; set; } = string.Empty;
         public string TaxPayerName { get; set; } = string.Empty;
-        public string TaxPayerTIN { get; set; } = "2000181693";
-        public string VatNumber { get; set; } = "220572879";
+        public string TaxPayerTIN { get; set; } = "";
+        public string VatNumber { get; set; } = "";
         public string DeviceBranchName { get; set; } = string.Empty;
         public string Province { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
@@ -44,11 +44,11 @@ namespace ZimraEGS.Models
         public string ApiBaseUrl => Utilities.GetBaseUrl(IntegrationType);
         public CertificateInfo()
         {
-            DeviceID = 20203;
-            DeviceSerialNumber = "MGR2401";
+            DeviceID = 0;
+            DeviceSerialNumber = "";
             DeviceModelName = "Server";
             DeviceModelVersion = "v1";
-            ActivationKey = "00375086";
+            ActivationKey = "";
         }
         public string ToBusinessAddress()
         {

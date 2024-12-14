@@ -1,8 +1,53 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "ZimraEGS Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-n25">
+    <div class="text-center">
+        <div class="card shadow-lg rounded p-4 mt-4">
+        <h2 class="mb-3">Welcome to ZimraEGS</h2>
+        <p class="lead">The Simple and Free eInvoicing Integration Solution</p>
+        </div>
+
+        <div class="card shadow-lg rounded p-4 mt-4">
+            <h4 class="mb-3">What is ZimraEGS?</h4>
+            <p class="custom-lead">
+                ZimraEGS is a web service designed to simplify your eInvoicing process.<br /> 
+                It seamlessly integrates the <a href="https://manager.io" target="_blank">"Manager"</a> accounting application with the
+                <a href="https://fdms.zimra.co.zw/" target="_blank">ZIMRA Fiscal Device Management System</a>
+            </p>
+           
+            <div class="d-flex justify-content-center align-items-center my-3">
+                <div class="mx-3">
+                    <img src="/images/managerlogo.png" alt="Manager io Icon" class="img-fluid" style="height: 100px;">
+                </div>
+                <span class="fs-3 mx-3">&#x2194;</span>
+                <div class="mx-3">
+                    <img src="/images/logo.png" alt="Zimra EGS Icon" class="img-fluid" style="height: 100px;">
+                </div>
+                <span class="fs-3 mx-3">&#x2194;</span>
+                <div class="mx-3">
+                    <img src="/images/Zimra-logo.png" alt="Zimra FDMS Icon" class="img-fluid" style="height: 100px;">
+                </div>
+            </div>
+
+            <h4 class="mt-2">How to Start?</h4>
+            <p class="custom-lead">To begin, add the relay URL to your invoice: <span style="font-weight: bold;" id="relay-url"></span>.</p>
+            <p class="custom-lead">Save your invoice and click [Relay]. <br />
+                On the first use, you will be redirected to the business setup page to integrate Manager with Zimra FDMS.<br /> 
+                Follow the setup wizard, and you're ready to go.</p>
+
+            <h4 class="mt-4"><b>Attention</b></h4>
+            <p class="custom-lead">This is an initial release focused on testing and ensuring all features function as expected.</p>
+        </div>
+    </div>
 </div>
+
+<script>
+    let currentUrl = window.location.origin + window.location.pathname;
+    if (currentUrl.endsWith('/')) {
+        currentUrl = currentUrl.slice(0, -1);
+    }
+    const relayUrl = currentUrl + '/relay';
+    document.getElementById('relay-url').textContent = relayUrl;
+</script>

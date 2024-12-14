@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using System.IO.Compression;
 using System.Net;
-using System.Text;
 using ZimraEGS.ApiClient.Helpers;
 using ZimraEGS.ApiClient.Models;
 using ZimraEGS.Helpers;
@@ -15,10 +14,24 @@ namespace ZimraEGS.Controllers
     {
         private readonly HttpClient _httpClient = new();
 
-        public IActionResult Index()
+        //public IActionResult Index()
+        //{
+        //    var model = new SetupViewModel();
+        //    return View(model);
+        //}
+
+        [HttpGet("Setup/UpdateBusinessData")]
+        public IActionResult UpdateBusinessData()
         {
-            var model = new SetupViewModel();
-            return View(model);
+            var svmJson = TempData["SetupViewModel"] as string;
+            if (string.IsNullOrEmpty(svmJson))
+            {
+                // Handle the case where no TempData is found
+                return Content("No TempData found."); // For debugging purposes
+            }
+
+            var viewModel = JsonConvert.DeserializeObject<SetupViewModel>(svmJson);
+            return View(viewModel); // This will render Views/Setup/UpdateBusinessData.cshtml
         }
 
         public IActionResult Register()
@@ -94,16 +107,6 @@ namespace ZimraEGS.Controllers
                 return StatusCode(500, new { Error = $"Internal server error: {ex.Message}" });
             }
         }
-
-        public string AddPemHeaderFooterToCsr(string base64Csr)
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("-----BEGIN CERTIFICATE REQUEST-----");
-            sb.AppendLine(base64Csr);
-            sb.AppendLine("-----END CERTIFICATE REQUEST-----");
-            return sb.ToString();
-        }
-
 
         [HttpPost("setup/registerdevice")]
         public async Task<IActionResult> RegisterDeviceAsync([FromBody] DeviceRegistrationDto deviceRegistration)
@@ -229,13 +232,10 @@ namespace ZimraEGS.Controllers
         [HttpPost("setup/savecertificate")]
         public IActionResult SaveCertificate(SetupViewModel viewModel)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest(new { Errors = "Error Saving Certificate" });
-            //}
             try
             {
                 CertificateInfo certificateInfo = viewModel.CertificateInfo;
+
                 var base64CertificateInfo = ObjectCompressor.SerializeToBase64String(certificateInfo);
 
                 // Update businessDetails
@@ -248,65 +248,30 @@ namespace ZimraEGS.Controllers
                         ""Address"": """",
                         ""CustomFields2"": {
                             ""Decimals"": {
-                                ""8d99fa20-d203-4b83-b8f4-96e95bacb930"": 0,
-                                ""b3d3836f-e798-4b5d-b5ba-4472ba62ebfb"": 0,
-                                ""bc92c626-80ce-46da-bf97-189f047963a9"": 0,
-                                ""f07244b7-314f-4d3a-b60d-dbe66bd9f3ef"": 0
                             },
                             ""Strings"": {
-                                ""2147d331-3237-46b3-a842-0a5bff077f9d"": """",
-                                ""65016233-ef27-43da-8dc7-5d808093faca"": """",
-                                ""98eef11a-e241-4713-b73d-8219fce8b032"": """",
-                                ""bf449d08-a4d9-4c8b-ac16-1ba366688d13"": """"
+                                ""f7214db4-6726-4aa9-b5cd-3ff90ce9ba6c"": """",
+                                ""0f0bf167-4b63-493d-ab45-049a76a07f46"": """",
+                                ""6a347c55-735a-4a38-8cf6-0db93dce2ded"": """",
+                                ""329de867-9cf1-4dfe-8b06-5084bce788c8"": """"
                             }
                         },
-                        ""Name"": ""Business Name""
                     }";
                 }
 
                 businessDetails = RelayDataHelper.UpdateOrCreateField(businessDetails, "Name", certificateInfo.TaxPayerName);
                 businessDetails = RelayDataHelper.UpdateOrCreateField(businessDetails, "Address", certificateInfo.ToBusinessAddress());
                 businessDetails = RelayDataHelper.ModifyStringCustomFields2(businessDetails, ManagerCustomField.CertificateInfoGuid, base64CertificateInfo);
-                //businessDetails = RelayDataHelper.UpdateOrCreateField(businessDetails, $"CustomFields2.Decimals.{ManagerCustomField.FiscalDayOpenedGuid}", 9090);
+                businessDetails = RelayDataHelper.ModifyStringCustomFields2(businessDetails, ManagerCustomField.AppVersionGuid, VersionHelper.GetVersion());
+
                 viewModel.BusinessDetails = businessDetails;
 
-                // Serialize BusinessDetails for JavaScript update
                 viewModel.BusinessDetailsJson = JsonConvert.SerializeObject(businessDetails);
 
-                // Console.WriteLine(viewModel.BusinessDetails);
                 using (var memoryStream = new MemoryStream())
                 {
                     using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
                     {
-                        //// File 1: Certificate Request
-                        //var csrEntry = archive.CreateEntry("TaxPayer.csr");
-                        //using (var writer = new StreamWriter(csrEntry.Open()))
-                        //{
-                        //    writer.Write(certificateInfo.GeneratedCSR);
-                        //}
-
-                        //// File 2: PrivateKey
-                        //var privateKeyEntry = archive.CreateEntry("PrivateKey.pem");
-                        //using (var writer = new StreamWriter(privateKeyEntry.Open()))
-                        //{
-                        //    writer.Write(certificateInfo.PrivateKey);
-                        //}
-
-                        //// File 3: Device Certificate
-                        //var certificateEntry = archive.CreateEntry("DeviceCertificate.pem");
-                        //using (var writer = new StreamWriter(certificateEntry.Open()))
-                        //{
-                        //    writer.Write(certificateInfo.DeviceCertificate);
-                        //}
-
-                        //// File 4: Cerver Certificate
-                        //var serverCertificateEntry = archive.CreateEntry("SerVerCertificate.pem");
-                        //using (var writer = new StreamWriter(certificateEntry.Open()))
-                        //{
-                        //    writer.Write(certificateInfo.ServerCertificate.First());
-                        //}
-
-                        // File 5: Integration info
                         var infoEntry = archive.CreateEntry($"{certificateInfo.VatNumber}_{certificateInfo.DeviceID.ToString().PadLeft(10, '0')}_{certificateInfo.IntegrationType.ToString()}.json");
 
                         using (var writer = new StreamWriter(infoEntry.Open()))
@@ -317,12 +282,12 @@ namespace ZimraEGS.Controllers
                     }
 
                     memoryStream.Position = 0;
+
                     var fileContent = memoryStream.ToArray();
-                    viewModel.FileContent = Convert.ToBase64String(fileContent); // Convert file content to Base64
+                    viewModel.FileContent = Convert.ToBase64String(fileContent);
                     viewModel.Filename = $"{certificateInfo.VatNumber}_{certificateInfo.DeviceID.ToString().PadLeft(10, '0')}_{certificateInfo.IntegrationType.ToString()}.zip";
                     viewModel.IsFileReady = true;
                 }
-
             }
             catch
             {

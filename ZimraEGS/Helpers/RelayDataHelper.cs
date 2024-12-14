@@ -17,7 +17,7 @@ namespace ZimraEGS.Helpers
             }
             else
             {
-                targetSection = FindSectionContainingKey(jsonObject, key);
+                targetSection = FindJObjectByKey(jsonObject, key);
             }
 
             if (targetSection == null)
@@ -77,7 +77,7 @@ namespace ZimraEGS.Helpers
             }
             else
             {
-                targetSection = FindSectionContainingKey(jsonObject, key);
+                targetSection = FindJObjectByKey(jsonObject, key);
             }
 
             if (targetSection == null)
@@ -125,31 +125,147 @@ namespace ZimraEGS.Helpers
             return jsonObject.ToString(Formatting.Indented);
         }
 
-
-
-        private static JObject FindSectionContainingKey(JObject jsonObject, string key)
+        public static string? GetStringCustomField2Value(string editData, string fieldGuid, string? key = null)
         {
-            var queue = new Queue<JObject>();
+            JObject jsonObject = JObject.Parse(editData);
+            JObject targetSection;
+
+            // Determine the target section based on the key
+            if (string.IsNullOrEmpty(key))
+            {
+                targetSection = jsonObject; // Work with the root object if no key
+            }
+            else
+            {
+                targetSection = FindJObjectByKey(jsonObject, key);
+            }
+
+            if (targetSection == null)
+            {
+                targetSection = jsonObject;
+                //throw new InvalidOperationException("The section with the specified key was not found.");
+            }
+
+            // Access the "CustomFields2" section
+            JObject customFields2 = targetSection["CustomFields2"] as JObject;
+            if (customFields2 == null)
+            {
+                return null; // Return null if the CustomFields2 section does not exist
+            }
+
+            // Access the "Strings" section
+            JObject strings = customFields2["Strings"] as JObject;
+            if (strings == null)
+            {
+                return null; // Return null if the Strings section does not exist
+            }
+
+            // Return the value associated with the fieldGuid, or null if it doesn't exist
+            return strings.ContainsKey(fieldGuid) ? strings[fieldGuid]?.ToString() : null;
+        }
+
+        public static double GetDecimalCustomField2Value(string editData, string fieldGuid, string? key = null)
+        {
+            JObject jsonObject = JObject.Parse(editData);
+            JObject targetSection;
+
+            // Determine the target section based on the key
+            if (string.IsNullOrEmpty(key))
+            {
+                targetSection = jsonObject; // Work with the root object if no key
+            }
+            else
+            {
+                targetSection = FindJObjectByKey(jsonObject, key);
+            }
+
+            if (targetSection == null)
+            {
+                targetSection = jsonObject;
+                //throw new InvalidOperationException("The section with the specified key was not found.");
+            }
+
+            // Access the "CustomFields2" section
+            JObject customFields2 = targetSection["CustomFields2"] as JObject;
+            if (customFields2 == null)
+            {
+                return 0; // Return null if the CustomFields2 section does not exist
+            }
+
+            // Access the "Decimals" section
+            JObject decimals = customFields2["Decimals"] as JObject;
+            if (decimals == null)
+            {
+                return 0; // Return null if the Decimals section does not exist
+            }
+
+            // Return the value associated with the fieldGuid, or null if it doesn't exist
+            return decimals.ContainsKey(fieldGuid) ? (double)decimals[fieldGuid] : 0;
+        }
+
+        private static JObject FindJObjectByKey(JObject jsonObject, string key)
+        {
+            // Check if the root object contains the specified key
+            if (jsonObject.TryGetValue(key, out JToken value))
+            {
+                // Check if the value is a JObject
+                if (value.Type == JTokenType.Object)
+                {
+                    return (JObject)value; // Return the JObject associated with the key
+                }
+                else
+                {
+                    // If the value is not a JObject, you can choose to return null or throw an exception
+                    return null; // or throw new InvalidOperationException($"The value for key '{key}' is not a JObject.");
+                }
+            }
+
+            // If not found, perform a breadth-first search
+            var queue = new Queue<JToken>();
             queue.Enqueue(jsonObject);
 
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                if (string.IsNullOrEmpty(key) || current.Property(key) != null)
+
+                // Check if the current token is an object
+                if (current.Type == JTokenType.Object)
                 {
-                    return current;
-                }
-                foreach (var property in current.Properties())
-                {
-                    if (property.Value.Type == JTokenType.Object)
+                    var currentObject = (JObject)current; // Cast to JObject
+
+                    // Check if the current JObject contains the specified key
+                    if (currentObject.TryGetValue(key, out value))
                     {
-                        queue.Enqueue(property.Value as JObject);
+                        // Check if the value is a JObject
+                        if (value.Type == JTokenType.Object)
+                        {
+                            return (JObject)value; // Return the JObject associated with the key
+                        }
+                        else
+                        {
+                            // If the value is not a JObject, you can choose to return null or throw an exception
+                            return null; // or throw new InvalidOperationException($"The value for key '{key}' is not a JObject.");
+                        }
+                    }
+
+                    // Enqueue all child properties
+                    foreach (var property in currentObject.Properties())
+                    {
+                        queue.Enqueue(property.Value);
+                    }
+                }
+                else if (current.Type == JTokenType.Array)
+                {
+                    // If the property is an array, enqueue each item
+                    foreach (var item in current.Children())
+                    {
+                        queue.Enqueue(item);
                     }
                 }
             }
-            return null;
-        }
 
+            return null; // Return null if the key is not found
+        }
 
         public static string GetValueJson(string jsonString, string datakey)
         {
