@@ -1,6 +1,7 @@
-# ZimraEGS Application Testing Guide
+# Manager Io - Zimra FDMS Integration
 
----
+## ZimraEGS Application Testing Guide
+
 
 ## Purpose
 This guide aims to assist users in integrating and testing the ZimraEGS application, from device registration to invoice reporting.
